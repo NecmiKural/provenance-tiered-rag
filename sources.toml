@@ -1,0 +1,20 @@
+# Every source the corpus is built from. Tier T1 is statute, T2 official guidance and T3
+# untrusted notes. tests/test_corpus.py checks each committed file against its sha256.
+
+[[source]]
+id = "nz-gst-act"
+tier = "T1"
+jurisdiction = "NZ"
+title = "Goods and Services Tax Act 1985"
+act = "/act/public/1985/141/en/"
+licence = "No copyright in New Zealand legislation (Copyright Act 1994, s 27)"
+# Consolidations from the first one the site holds after the 1985 original to a fixed last
+# one, so a rerun of `provrag fetch` gives the same file.
+first_version = "2007-09-03"
+last_version = "2026-06-30"
+sections = [
+    "6", "8", "9", "14", "15", "16", "19", "19A", "19D", "23", "24", "25", "26",
+    "51", "52", "53", "75",
+]
+path = "corpus/nz/gst-act.jsonl"
+sha256 = "a7c33a7138a70e3722070c5620c2d4703314675ec327b874654b8bb3df306fd8"
