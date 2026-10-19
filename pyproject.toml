@@ -7,7 +7,10 @@ license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Necmi Kural" }]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "openai>=3.34.0",
+    "psycopg[binary]>=3.3.6",
+]
 
 [project.scripts]
 provrag = "provrag.cli:main"
