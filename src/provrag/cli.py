@@ -74,8 +74,8 @@ def cmd_retrieval(args: argparse.Namespace) -> None:
     with db.connect() as conn:
         db.reset(conn)
         ingest.load(conn, corpus_chunks(), embedder)
-        result = retrieval_eval.run(conn, embedder)
-    path = results.write(result, "retrieval")
+        result = retrieval_eval.run(conn, embedder, args.held_back)
+    path = results.write(result, "retrieval-held-back" if args.held_back else "retrieval")
     for name, m in result["methods"].items():
         print(
             f"{name:12} recall@5 {m['all']['recall_at_5']['rate']:.3f}  mrr {m['all']['mrr']:.3f}"
@@ -165,6 +165,7 @@ def main(argv: list[str] | None = None) -> None:
     p = sub.add_parser("index", help="recreate the database index from corpus/")
     p.set_defaults(func=cmd_index)
     p = sub.add_parser("retrieval", help="the retrieval ablation; writes results/*.json")
+    p.add_argument("--held-back", action="store_true", help="the held-back questions, once")
     p.set_defaults(func=cmd_retrieval)
     p = sub.add_parser("ask", help="answer one question, with citations checked in code")
     p.add_argument("question")

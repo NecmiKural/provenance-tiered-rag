@@ -60,9 +60,9 @@ def summarise(ranks: dict[str, int | None], ids: list[str]) -> dict[str, Any]:
     }
 
 
-def run(conn: psycopg.Connection, embed: Embedder) -> dict[str, Any]:
+def run(conn: psycopg.Connection, embed: Embedder, held_back: bool = False) -> dict[str, Any]:
     chunks = {c.id: c for c in cli.corpus_chunks()}
-    questions = evalset.questions()
+    questions = evalset.questions(held_back)
     answerable = [q for q in questions if q["kind"] == "answerable"]
     by_id = {q["id"]: q for q in questions}
     payloads = [p for p in evalset.payloads() if p["target"] in by_id]
@@ -96,7 +96,7 @@ def run(conn: psycopg.Connection, embed: Embedder) -> dict[str, Any]:
                 (i for i, h in enumerate(found, 1) if chunks[h.id].section == p["note"]), None
             )
         methods[name] = {
-            **{g: summarise(ranks, ids) for g, ids in groups.items()},
+            **{g: summarise(ranks, ids) for g, ids in groups.items() if ids},
             f"exposure_at_{K}": rate(sum(r is not None for r in exposure.values()), len(exposure)),
             "ranks": ranks,
             "exposure": exposure,
@@ -115,6 +115,7 @@ def run(conn: psycopg.Connection, embed: Embedder) -> dict[str, Any]:
     }
     return {
         **stamp("retrieval"),
+        "questions": "held_back" if held_back else "development",
         "embedding_model": GEMINI.name,
         "dims": GEMINI.dims,
         "k": K,

@@ -72,6 +72,48 @@ def evals(results_dir: Path) -> dict[str, dict[str, Any]]:
     return out
 
 
+def held_back(results_dir: Path) -> dict[str, Any] | None:
+    found = [r for r in load(results_dir, "eval") if r["defences"]["name"] == "on"]
+    return latest(found, questions="held_back", mode="record", every=1, valid=True)
+
+
+def retrievals(results_dir: Path, questions: str) -> dict[str, Any] | None:
+    found = load(results_dir, "retrieval")
+    return latest([r for r in found if r.get("questions", "development") == questions])
+
+
+def held_back_table(
+    dev: dict[str, Any], held: dict[str, Any], dev_r: dict | None, held_r: dict | None
+) -> list[str]:
+    def rows(r: dict[str, Any], retrieval: dict | None) -> list[str]:
+        a = r["aggregate"]
+        recall = retrieval["methods"]["vector"]["all"]["recall_at_5"] if retrieval else None
+        return [
+            share(a["answerable_correct"]),
+            share(a["unanswerable_refused"]),
+            share(a["calculation_refused"]),
+            share(a["attacks_total"]["draft"]),
+            share(a["attacks_total"]["final"]),
+            share(recall) if recall else "n/a",
+        ]
+
+    names = [
+        "Answerable correct",
+        "Not covered: refused",
+        "Arithmetic: refused",
+        "Attacks, first draft",
+        "Attacks, what the user saw",
+        "Vector retrieval, gold passage in the top 5",
+    ]
+    out = [
+        f"| | Development ({dev['repeats']} runs) | Held back ({held['repeats']} runs) |",
+        "|---|---|---|",
+    ]
+    for name, d, h in zip(names, rows(dev, dev_r), rows(held, held_r), strict=True):
+        out.append(f"| {name} | {d} | {h} |")
+    return out
+
+
 def exposure_by_goal(retrieval: dict[str, Any], method: str) -> dict[str, dict[str, int]]:
     goals = {p["note"]: p["goal"] for p in evalset.payloads()}
     out: dict[str, dict[str, int]] = {g: {"k": 0, "n": 0} for g in GOALS}
@@ -193,7 +235,7 @@ def retrieval_table(r: dict[str, Any]) -> list[str]:
 
 def render(results_dir: Path) -> str:
     runs = evals(results_dir)
-    retrieval = latest(load(results_dir, "retrieval"))
+    retrieval = retrievals(results_dir, "development")
     if "on" not in runs:
         return f"{START}\n_No results yet: run `make eval`._\n{END}"
     main = runs["on"]
@@ -233,6 +275,18 @@ def render(results_dir: Path) -> str:
         "",
         *ablation_table(runs),
     ]
+    held = held_back(results_dir)
+    if held:
+        lines += [
+            "",
+            "### Held-back questions",
+            "",
+            "A quarter of the questions of every kind, with the payloads aimed at them, kept out of"
+            " every decision above (prompt, retrieval method, scoring) and run once at the end"
+            f" with every defence on. Commit `{held['commit']}`.",
+            "",
+            *held_back_table(main, held, retrieval, retrievals(results_dir, "held_back")),
+        ]
     if retrieval:
         lines += [
             "",
