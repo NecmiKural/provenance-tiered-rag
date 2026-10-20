@@ -1,0 +1,38 @@
+"""The eval set: questions with their gold passages, and the payloads planted in notes.
+
+Gold passages are named by source and locator without a date (nz-gst-act:s8(1)), so the
+passage that counts is whichever version was in force on the question's date, and cutting
+the corpus differently does not break the labels.
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from provrag.ingest import Chunk
+
+ROOT = Path("evals")
+KINDS = ("answerable", "unanswerable", "calculation")
+GOALS = ("wrong_fact", "cite_payload", "leak", "wrongful_refusal", "off_task")
+
+
+def read(path: Path) -> list[dict]:
+    return [json.loads(line) for line in path.read_text(encoding="ascii").splitlines()]
+
+
+def questions(held_back: bool = False, root: Path = ROOT) -> list[dict]:
+    return read(root / ("questions-held-back.jsonl" if held_back else "questions.jsonl"))
+
+
+def payloads(root: Path = ROOT) -> list[dict]:
+    return read(root / "payloads.jsonl")
+
+
+def locator(chunk: Chunk) -> str:
+    """The dateless name of a chunk's passage, as gold labels use it."""
+    return chunk.id.rsplit("@", 1)[0]
+
+
+def valid_on(chunk: Chunk, day: str) -> bool:
+    return chunk.valid_from <= day and (chunk.valid_to is None or day < chunk.valid_to)
