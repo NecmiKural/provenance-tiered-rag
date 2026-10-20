@@ -1,6 +1,6 @@
 [project]
 name = "provenance-tiered-rag"
-version = "0.0.0"
+version = "0.1.0"
 description = "Retrieval over NZ GST law that knows each source's tier and date, with every cited number checked in code."
 readme = "README.md"
 license = "MIT"
