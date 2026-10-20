@@ -12,6 +12,7 @@ from provrag import (
     answer,
     db,
     embed,
+    evaluate,
     guidance,
     ingest,
     legislation,
@@ -110,6 +111,43 @@ def cmd_ask(args: argparse.Namespace) -> None:
     )
 
 
+def cmd_eval(args: argparse.Namespace) -> None:
+    defences = answer.DEFENCES[args.defences]
+    parts = ["eval", args.model.replace(":", "_"), defences.name]
+    parts += ["held-back"] if args.held_back else []
+    parts += [f"every{args.every}"] if args.every > 1 else []
+    name = args.name or "-".join([*parts, args.mode])
+    cassette = args.cassette or (Path("cassettes") / f"{name}.jsonl")
+    embedder = embed.embedder(embed.GEMINI, embed.cache_path(embed.GEMINI))
+    with db.connect() as conn:
+        db.reset(conn)
+        ingest.load(conn, corpus_chunks(), embedder)
+        result = evaluate.evaluate(
+            conn,
+            embedder,
+            MODELS[args.model],
+            defences,
+            args.repeats,
+            args.mode,
+            None if args.mode == "live" else cassette,
+            args.workers,
+            args.every,
+            args.held_back,
+        )
+    a = result["aggregate"]
+    print(
+        f"answerable correct {a['answerable_correct']['rate']:.3f}"
+        f"  unanswerable refused {a['unanswerable_refused']['rate']:.3f}"
+        f"  attacks final {a['attacks_total']['final']['rate']:.3f}"
+        f"  draft {a['attacks_total']['draft']['rate']:.3f}"
+        f"  provider errors {a['provider_errors']}"
+    )
+    if not result["valid"]:
+        raise SystemExit("provider errors: not saved; rerun with fewer --workers")
+    path = results.write(result, name, args.out, dated=args.name is None)
+    print(f"wrote {path} (commit {result['commit']})")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="provrag", description=__doc__)
     sub = parser.add_subparsers(required=True)
@@ -127,6 +165,18 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--defences", choices=sorted(answer.DEFENCES), default="on")
     p.add_argument("--k", type=int, default=retrieval_eval.K)
     p.set_defaults(func=cmd_ask)
+    p = sub.add_parser("eval", help="clean and attacked runs, repeated; writes results/*.json")
+    p.add_argument("--model", choices=sorted(MODELS), default="deepseek-flash")
+    p.add_argument("--defences", choices=sorted(answer.DEFENCES), default="on")
+    p.add_argument("--repeats", type=int, default=3)
+    p.add_argument("--mode", choices=("live", "record", "replay"), default="record")
+    p.add_argument("--cassette", type=Path, default=None)
+    p.add_argument("--workers", type=int, default=8)
+    p.add_argument("--every", type=int, default=1, help="every Nth case only, for a slice")
+    p.add_argument("--held-back", action="store_true", help="the held-back questions, once")
+    p.add_argument("--out", type=Path, default=Path("results"))
+    p.add_argument("--name", default=None)
+    p.set_defaults(func=cmd_eval)
     args = parser.parse_args(argv)
     args.func(args)
 

@@ -68,8 +68,10 @@ def stamp(kind: str) -> dict[str, Any]:
     }
 
 
-def write(result: dict[str, Any], name: str, out_dir: Path = Path("results")) -> Path:
+def write(
+    result: dict[str, Any], name: str, out_dir: Path = Path("results"), dated: bool = True
+) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
-    path = out_dir / f"{result['generated_at'][:10]}-{name}.json"
+    path = out_dir / (f"{result['generated_at'][:10]}-{name}.json" if dated else f"{name}.json")
     path.write_text(json.dumps(result, indent=1, sort_keys=True) + "\n")
     return path

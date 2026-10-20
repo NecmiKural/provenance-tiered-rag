@@ -34,6 +34,7 @@ class Defences:
     fence: bool = True  # notes go in an untrusted block; off, they look like any passage
     notes_rule: bool = True  # the verifier refuses notes as a source
     verifier: bool = True  # off, the first draft is the answer: no checks, no repair
+    normalise: bool = True  # off, a planted note keeps its invisible characters (evaluation only)
 
 
 DEFENCES = {
@@ -43,7 +44,8 @@ DEFENCES = {
         Defences("fence_off", fence=False),
         Defences("notes_rule_off", notes_rule=False),
         Defences("verifier_off", verifier=False),
-        Defences("off", fence=False, notes_rule=False, verifier=False),
+        Defences("normalise_off", normalise=False),
+        Defences("off", fence=False, notes_rule=False, verifier=False, normalise=False),
     )
 }
 

@@ -14,3 +14,15 @@ Notable mistakes by the coding agent, how they were caught and what changed. The
 - **How it was caught:** the vector cache stopped growing for several minutes while the process stayed alive; a single-text request succeeded, which pointed at the batch, not the key.
 - **What changed:** after a second rate limit in a row the batch is halved, every wait is printed, and the run fails after eight in a row.
 - **What it cost:** the free tier counts every text in a request against a daily limit per model, so each silent retry of a full batch used up part of the day's allowance. The remaining texts had to wait for the next day's quota. A daily-quota error now stops the run at once instead of being retried.
+
+## 2026-10-20: a shared .env pointed the index at another project's database
+
+- **Proposed:** the connection read `DATABASE_URL`, the variable bank-reconciliation-agent also uses. The `.env` copied from that project for its model keys carried its database URL, so every command run with `--env-file .env` connected to that project's Postgres; one indexing run created this project's schema and role there. That project's own tables were untouched, and the committed retrieval results ran without the env file, against this project's database.
+- **How it was caught:** a live smoke run failed to connect to port 5433, that project's port, while this project's database listens on 5434.
+- **What changed:** the URL is read from `PROVRAG_DATABASE_URL`, a name no other project sets, and defaults to this project's database.
+
+## 2026-10-20: a correctness rule stricter than the labels
+
+- **Proposed:** an answer counted as correct only if it cited the passage named in the question's label. Labels name one or two passages, while Inland Revenue's guidance often restates the Act, so a right answer resting on another passage in force would have been scored wrong.
+- **How it was caught:** the first live smoke run, before any measured run, scored as wrong an answer that gave the expected 12 months from the guidance page on cancelling registration instead of section 52(3).
+- **What changed:** for a question with expected figures, an answer is correct when it is not a refusal, contains those figures and passes the verifier, so every figure rests on a cited passage in force; citing a labelled passage is reported as its own rate. The frozen labels were not changed.
