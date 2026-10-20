@@ -11,11 +11,14 @@ import psycopg
 from psycopg import sql
 
 DEFAULT_URL = "postgresql://provrag:provrag@localhost:5434/provrag"  # the compose.yaml service
+# A name of its own, so an .env shared with another project cannot point this one at the
+# wrong database: `provrag index` recreates its schema.
+URL_ENV = "PROVRAG_DATABASE_URL"
 ROLES = ("provrag_reader",)
 
 
 def connect(url: str | None = None) -> psycopg.Connection:
-    url = url or os.environ.get("DATABASE_URL") or DEFAULT_URL
+    url = url or os.environ.get(URL_ENV) or DEFAULT_URL
     return psycopg.connect(url, autocommit=True)
 
 
