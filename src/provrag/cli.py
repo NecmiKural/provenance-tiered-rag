@@ -16,6 +16,7 @@ from provrag import (
     guidance,
     ingest,
     legislation,
+    report,
     results,
     retrieval_eval,
     retrieve,
@@ -148,6 +149,13 @@ def cmd_eval(args: argparse.Namespace) -> None:
     print(f"wrote {path} (commit {result['commit']})")
 
 
+def cmd_report(args: argparse.Namespace) -> None:
+    stale = report.sync(Path("README.md"), Path("results"), check=args.check)
+    if args.check and stale:
+        raise SystemExit("README results are stale: run `uv run provrag report`")
+    print("README results " + ("rewritten" if stale else "already in sync"))
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="provrag", description=__doc__)
     sub = parser.add_subparsers(required=True)
@@ -177,6 +185,9 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--out", type=Path, default=Path("results"))
     p.add_argument("--name", default=None)
     p.set_defaults(func=cmd_eval)
+    p = sub.add_parser("report", help="rewrite the README results block from results/*.json")
+    p.add_argument("--check", action="store_true", help="fail if the block is stale")
+    p.set_defaults(func=cmd_report)
     args = parser.parse_args(argv)
     args.func(args)
 
