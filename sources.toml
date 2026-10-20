@@ -18,3 +18,37 @@ sections = [
 ]
 path = "corpus/nz/gst-act.jsonl"
 sha256 = "a7c33a7138a70e3722070c5620c2d4703314675ec327b874654b8bb3df306fd8"
+
+[[source]]
+id = "nz-ird-gst-guidance"
+tier = "T2"
+jurisdiction = "NZ"
+title = "Inland Revenue GST guidance"
+site = "https://www.ird.govt.nz/gst/"
+licence = "Crown copyright, Inland Revenue. Text reproduced under CC BY 4.0; logos and images excluded"
+retrieved = "2026-10-19"
+pages = [
+    "what-gst-is",
+    "registering-for-gst/registering-for-gst-voluntarily",
+    "registering-for-gst/which-gst-accounting-basis-and-filing-frequency-should-i-use",
+    "charging-gst/exempt-supplies",
+    "charging-gst/zero-rated-supplies",
+    "filing-and-paying-gst-and-refunds/calculating-gst",
+    "filing-and-paying-gst-and-refunds/filing-gst",
+    "filing-and-paying-gst-and-refunds/paying-gst",
+    "tax-invoices-for-gst/how-tax-invoices-for-gst-work",
+    "tax-invoices-for-gst/credit-and-debit-notes",
+    "gst-cancellation/when-to-cancel-your-gst-registration",
+    "changing-your-filing-frequency-or-accounting-basis/changing-your-gst-filing-frequency",
+]
+path = "corpus/nz/ird-gst-guidance.jsonl"
+sha256 = "78c35d906b05fa1ebe0bd3716f63f11b9416cfd2d18e45487afda48c495d0c97"
+
+[[source]]
+id = "nz-notes"
+tier = "T3"
+jurisdiction = "NZ"
+title = "Forum posts and practitioner notes"
+licence = "Written for this project (MIT). Some carry prompt-injection payloads on purpose"
+path = "corpus/nz/notes.jsonl"
+sha256 = "8b105efd24fb810e152f64ae934a3aaf3e39055c17e0e8754eb4748d670ab33e"

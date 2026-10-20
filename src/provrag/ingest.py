@@ -52,15 +52,22 @@ class Chunk:
         return f"{self.heading}\n{self.body}"
 
 
-def statute_chunks(source: dict, root: Path = Path(".")) -> list[Chunk]:
+def locator(source: dict, row: dict) -> str:
+    """s8(1) for a statute subsection, page#3 for the third heading of a guidance page, and
+    the note id for a note."""
+    if "act" in source:
+        return f"s{row['section']}" + (f"({row['part']})" if row["part"] else "")
+    return f"{row['section']}#{row['part']}" if row["part"] else row["section"]
+
+
+def source_chunks(source: dict, root: Path = Path(".")) -> list[Chunk]:
     chunks = []
     for row in legislation.read_jsonl(root / source["path"]):
         heading, hidden_heading = normalise(row["heading"])
         body, hidden_body = normalise(row["text"])
-        part = f"({row['part']})" if row["part"] else ""
         chunks.append(
             Chunk(
-                id=f"{source['id']}:s{row['section']}{part}@{row['valid_from']}",
+                id=f"{source['id']}:{locator(source, row)}@{row['valid_from']}",
                 source=source["id"],
                 tier=source["tier"],
                 jurisdiction=source["jurisdiction"],
