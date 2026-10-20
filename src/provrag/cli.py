@@ -1,13 +1,15 @@
-"""provrag: build and index the corpus, and measure retrieval."""
+"""provrag: build and index the corpus, measure retrieval, and answer questions."""
 
 from __future__ import annotations
 
 import argparse
 import hashlib
 import tomllib
+from datetime import date
 from pathlib import Path
 
 from provrag import (
+    answer,
     db,
     embed,
     guidance,
@@ -15,7 +17,9 @@ from provrag import (
     legislation,
     results,
     retrieval_eval,
+    retrieve,
 )
+from provrag.llm import LLM, MODELS
 
 SOURCES = Path("sources.toml")
 
@@ -78,6 +82,34 @@ def cmd_retrieval(args: argparse.Namespace) -> None:
     print(f"wrote {path} (commit {result['commit']})")
 
 
+def cmd_ask(args: argparse.Namespace) -> None:
+    """Retrieve, answer and verify one question against the index `provrag index` built."""
+    chunks = {c.id: c for c in corpus_chunks()}
+    notes = sorted({c.section for c in chunks.values() if c.source == retrieve.NOTES_SOURCE})
+    embedder = embed.embedder(embed.GEMINI, embed.cache_path(embed.GEMINI))
+    vector = embedder([args.question])[args.question]
+    with db.connect() as conn:
+        hits = retrieve.search(conn, args.question, vector, args.as_of, notes, k=args.k)
+    outcome = answer.answer(
+        args.question,
+        args.as_of,
+        [chunks[h.id] for h in hits],
+        LLM(MODELS[args.model]),
+        answer.DEFENCES[args.defences],
+    )
+    final = outcome.answer
+    if final.refused:
+        print(f"Refused ({outcome.refused_by}): {final.reason}")
+    else:
+        print(final.answer)
+        for claim in final.claims:
+            print(f"- {claim.text} [{', '.join(claim.chunk_ids)}]")
+    print(
+        f"({len(outcome.attempts)} model call(s), {'repaired, ' if outcome.repaired else ''}"
+        f"${outcome.cost_usd:.4f}, {outcome.latency_ms / 1000:.1f} s)"
+    )
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="provrag", description=__doc__)
     sub = parser.add_subparsers(required=True)
@@ -88,6 +120,13 @@ def main(argv: list[str] | None = None) -> None:
     p.set_defaults(func=cmd_index)
     p = sub.add_parser("retrieval", help="the retrieval ablation; writes results/*.json")
     p.set_defaults(func=cmd_retrieval)
+    p = sub.add_parser("ask", help="answer one question, with citations checked in code")
+    p.add_argument("question")
+    p.add_argument("--as-of", default=date.today().isoformat(), help="the date asked about")
+    p.add_argument("--model", choices=sorted(MODELS), default="deepseek-flash")
+    p.add_argument("--defences", choices=sorted(answer.DEFENCES), default="on")
+    p.add_argument("--k", type=int, default=retrieval_eval.K)
+    p.set_defaults(func=cmd_ask)
     args = parser.parse_args(argv)
     args.func(args)
 

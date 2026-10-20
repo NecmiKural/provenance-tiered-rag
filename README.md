@@ -2,7 +2,7 @@
 
 Question answering over New Zealand GST law that knows where each passage comes from and when it was in force. Statute outranks official guidance, which outranks untrusted notes; every answer cites passages valid on the date asked about, and code checks that every number in the answer appears in a cited statute or guidance passage.
 
-**Work in progress.** The corpus, the index, the frozen eval set and retrieval are in place; answering, the verifier and the evaluation follow. No results are reported yet.
+**Work in progress.** The corpus, the index, the frozen eval set, retrieval, answering and the verifier are in place; the measured evaluation follows. No results are reported yet.
 
 ## Corpus
 
@@ -34,6 +34,26 @@ Oracle tests check, with no model, that every gold passage exists and is in forc
 make db      # Postgres 17 with pgvector on localhost:5434
 make index   # recreate the index from corpus/, offline
 make test
+```
+
+## Answering
+
+```
+question + date ──► retrieval: full text and pgvector fused by reciprocal rank,
+                    only passages in force on the date, ties to the higher tier
+               ──► model drafts json: an answer and claims, each citing passage ids
+               ──► verifier (code) ──► passes: the answer
+                                  └──► fails: the errors go back once ──► passes: the answer
+                                                                     └──► fails: a refusal with the reason
+```
+
+- **Prompt** ([prompts/answer.md](src/provrag/prompts/answer.md)). Statute and guidance passages are marked with their tier and dates; untrusted notes sit in a fenced block whose text cannot close the fence. The model answers in json and must refuse when the passages do not answer the question for the date, and when an answer would need arithmetic. Each rule has eval cases.
+- **Verifier** ([verify.py](src/provrag/verify.py)). In code, with no category chosen by the model: every cited passage was retrieved and was in force on the date; every typed number in a claim (a rate, an amount, a date, a period) is in a statute or guidance passage that claim cites, so "15 days" never supports "15%"; a note is never a source; every number in the answer text is in a claim; the numbers in the question are exempt. A calculated figure appears in no passage, so it cannot pass.
+- **Loop** ([answer.py](src/provrag/answer.py)). One draft, at most one repair with the verifier's errors and the fenced passages sent again, then an answer or a refusal that says why. Each defence (the fence, the notes rule, the verifier) can be switched off for the ablation.
+
+```bash
+uv run --env-file .env provrag ask "When is the GST return for the period ending 31 March due?"
+uv run --env-file .env provrag ask "What was the GST rate?" --as-of 2010-09-30
 ```
 
 > Not tax advice. A portfolio project; the questions, notes and evaluation are written for it.
