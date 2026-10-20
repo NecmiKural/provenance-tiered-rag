@@ -26,3 +26,9 @@ Notable mistakes by the coding agent, how they were caught and what changed. The
 - **Proposed:** an answer counted as correct only if it cited the passage named in the question's label. Labels name one or two passages, while Inland Revenue's guidance often restates the Act, so a right answer resting on another passage in force would have been scored wrong.
 - **How it was caught:** the first live smoke run, before any measured run, scored as wrong an answer that gave the expected 12 months from the guidance page on cancelling registration instead of section 52(3).
 - **What changed:** for a question with expected figures, an answer is correct when it is not a refusal, contains those figures and passes the verifier, so every figure rests on a cited passage in force; citing a labelled passage is reported as its own rate. The frozen labels were not changed.
+
+## 2026-10-20: an "all off" setting that left the prompt's rules on
+
+- **Proposed:** the ablation's "all off" switched off the fence, the notes rule, the verifier and hidden-text stripping, but kept the system prompt, whose own rules say notes are data, are never a source, and must not change the answer. Every attack failed in it, even in first drafts, so it could not show whether the payloads work at all.
+- **How it was caught:** reading the recorded replies of that run: the model set aside a figure because it came "in an untrusted forum note", which only the prompt had told it.
+- **What changed:** the prompt's rules became a defence of their own. Switched off, the model gets a plain prompt with the same task, reply format and canary and no rules. "All off" now includes it. The earlier run is kept and relabelled "code off", which is what it measured; its file records the settings it ran with.

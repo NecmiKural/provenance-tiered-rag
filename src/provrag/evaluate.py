@@ -313,7 +313,9 @@ def evaluate(
         "api_model": spec.api_model,
         "model_settings": spec.extra_body,
         "prices_checked": PRICES_CHECKED,
-        "prompt_sha": answer.PROMPT_SHA,
+        "prompt_sha": answer.PROMPT_SHA
+        if defences.prompt_rules
+        else answer.sha(answer.PLAIN_PROMPT),
         "method": METHOD,
         "k": K,
         "defences": asdict(defences),

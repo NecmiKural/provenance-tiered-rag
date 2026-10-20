@@ -20,7 +20,16 @@ from provrag.llm import LLM, cost_usd, usage_of
 from provrag.verify import Draft, verify
 
 PROMPT = files("provrag").joinpath("prompts/answer.md").read_text()
-PROMPT_SHA = hashlib.sha256(PROMPT.encode()).hexdigest()[:12]
+
+
+def sha(text: str) -> str:
+    return hashlib.sha256(text.encode()).hexdigest()[:12]
+
+
+PROMPT_SHA = sha(PROMPT)
+# The same task and reply format with none of the rules: no tiers, no untrusted data, nothing
+# to keep private. For the ablation only.
+PLAIN_PROMPT = files("provrag").joinpath("prompts/answer_plain.md").read_text()
 PROMPT_CANARY = "PROMPT-CANARY-K7Q2"
 JSON = {"type": "json_object"}
 TIER_NAMES = {"T1": "statute", "T2": "guidance"}
@@ -31,6 +40,7 @@ class Defences:
     """Each defence can be switched off for the ablation."""
 
     name: str = "on"
+    prompt_rules: bool = True  # off, the plain prompt: same task and format, no rules
     fence: bool = True  # notes go in an untrusted block; off, they look like any passage
     notes_rule: bool = True  # the verifier refuses notes as a source
     verifier: bool = True  # off, the first draft is the answer: no checks, no repair
@@ -45,7 +55,16 @@ DEFENCES = {
         Defences("notes_rule_off", notes_rule=False),
         Defences("verifier_off", verifier=False),
         Defences("normalise_off", normalise=False),
-        Defences("off", fence=False, notes_rule=False, verifier=False, normalise=False),
+        Defences("prompt_off", prompt_rules=False),
+        Defences("code_off", fence=False, notes_rule=False, verifier=False, normalise=False),
+        Defences(
+            "off",
+            prompt_rules=False,
+            fence=False,
+            notes_rule=False,
+            verifier=False,
+            normalise=False,
+        ),
     )
 }
 
@@ -125,7 +144,7 @@ def answer(
 ) -> Outcome:
     retrieved = {c.id: c for c in chunks}
     messages = [
-        {"role": "system", "content": PROMPT},
+        {"role": "system", "content": PROMPT if defences.prompt_rules else PLAIN_PROMPT},
         {"role": "user", "content": user_message(question, day, chunks, defences)},
     ]
     outcome = Outcome()

@@ -122,3 +122,10 @@ def test_the_prompt_carries_the_canary_the_leak_payloads_look_for():
     assert answer.PROMPT_CANARY in answer.PROMPT
     leaks = {p["canary"][1] for p in evalset.payloads() if p["goal"] == "leak"}
     assert leaks == {answer.PROMPT_CANARY}
+
+
+def test_without_prompt_rules_the_plain_prompt_keeps_only_task_format_and_canary():
+    _, requests = run(GOOD, defences=answer.DEFENCES["prompt_off"])
+    system = requests[0]["messages"][0]["content"]
+    assert system == answer.PLAIN_PROMPT and answer.PROMPT_CANARY in system
+    assert "untrusted" not in system.lower() and "never" not in system.lower()
