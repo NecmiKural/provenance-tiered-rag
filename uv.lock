@@ -217,6 +217,7 @@ source = { editable = "." }
 dependencies = [
     { name = "openai" },
     { name = "psycopg", extra = ["binary"] },
+    { name = "pydantic" },
 ]
 
 [package.dev-dependencies]
@@ -229,6 +230,7 @@ dev = [
 requires-dist = [
     { name = "openai", specifier = ">=3.34.0" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.3.6" },
+    { name = "pydantic", specifier = ">=2.11" },
 ]
 
 [package.metadata.requires-dev]

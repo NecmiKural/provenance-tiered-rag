@@ -1,29 +1,10 @@
 """The index enforces its own rules in Postgres: one text per provision per day, read-only
 answering, and dates that pick the law in force."""
 
-import os
-
 import psycopg
 import pytest
 
-from provrag import cli, db, embed, ingest
-
-
-@pytest.fixture(scope="module")
-def conn():
-    try:
-        c = db.connect()
-    except psycopg.OperationalError:
-        if os.environ.get("CI"):
-            raise
-        pytest.skip("Postgres not reachable; run `docker compose up -d --wait`")
-    db.reset(c)
-    ingest.load(
-        c, cli.corpus_chunks(), embed.embedder(embed.GEMINI, embed.cache_path(embed.GEMINI))
-    )
-    yield c
-    c.close()
-
+from provrag import cli, db
 
 IN_FORCE_SQL = """
 SELECT body FROM corpus.chunk
