@@ -2,8 +2,8 @@
 
 "19 Prozent" and "19 %" are the same percent, "25 000 Euro" and "25.000 €" the same amount,
 "1. Juli 2020" and "01.07.2020" the same date, "zehn Jahre" a count of years, and "bis zum
-10. Tag" a day of the month. References ("§ 19 Abs. 1 Satz 2 Nr. 1", "Anlage 2", "Art. 5")
-are not numbers, and bare figures without a kind are ignored.
+10. Tag" or "bis zum zehnten Tag" a day of the month. References ("§ 19 Abs. 1 Satz 2 Nr. 1",
+"Anlage 2", "Art. 5") are not numbers, and bare figures without a kind are ignored.
 
 NOTE: pattern based, written for federal tax law; numbers in words are read from one to
 twelve, and the text is NFKC-normalised first, so the law's non-breaking spaces count as spaces.
@@ -38,6 +38,15 @@ _REF = (
 # A reference word starts a word: "Satz 2" is a reference, the end of "Umsatz 19" is not.
 _REFERENCES = re.compile(rf"(?<!\w){_REF}\s*\d+[a-z]?(?:\s*(?:,|und|bis|oder)\s*\d+[a-z]?)*", re.I)
 
+ORDINALS = {
+    w: i
+    for i, w in enumerate(
+        "ersten zweiten dritten vierten fünften sechsten siebten achten neunten zehnten elften"
+        " zwölften".split(),
+        1,
+    )
+}
+
 _PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("date", re.compile(rf"\b(\d{{1,2}})\.\s*{_MONTH}\s+(\d{{4}})\b", re.I)),
     ("numeric_date", re.compile(r"\b(\d{1,2})\.(\d{1,2})\.(\d{4})\b")),
@@ -46,6 +55,7 @@ _PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("percent", re.compile(rf"\b{_COUNT}(?:,(\d+))?\s*(?:%|Prozent\b|vom\s+Hundert\b)", re.I)),
     ("day_month", re.compile(rf"\b(\d{{1,2}})\.\s*{_MONTH}\b", re.I)),
     ("ordinal_day", re.compile(r"\b(\d{1,2})\.\s*Tag", re.I)),
+    ("ordinal_word_day", re.compile(r"\b(" + "|".join(ORDINALS) + r")\s+Tag", re.I)),
     (
         "count",
         re.compile(
@@ -82,6 +92,8 @@ def _read(kind: str, g: tuple[str, ...]) -> Number:
         return "day_month", date(2000, MONTHS[g[1].lower()], int(g[0])).strftime("%m-%d")
     if kind == "ordinal_day":
         return "day_of_month", str(int(g[0]))
+    if kind == "ordinal_word_day":
+        return "day_of_month", str(ORDINALS[g[0].lower()])
     if kind == "count":
         unit = next(u for stem, u in _UNITS.items() if g[1].lower().startswith(stem))
         return f"count:{unit}", str(_int(g[0]))

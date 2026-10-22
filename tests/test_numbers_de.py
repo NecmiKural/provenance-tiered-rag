@@ -21,6 +21,7 @@ from provrag.numbers import extract, numbers
         ),
         ("am 01.01.2025", [("date", "2025-01-01")]),
         ("bis zum 10. Tag nach Ablauf", [("day_of_month", "10")]),
+        ("bis zum zehnten Tag nach Ablauf", [("day_of_month", "10")]),
         ("acht Jahre aufzubewahren", [("count:year", "8")]),
         ("innerhalb von zehn Tagen", [("count:day", "10")]),
     ],
