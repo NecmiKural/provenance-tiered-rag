@@ -53,10 +53,15 @@ class Chunk:
 
 
 def locator(source: dict, row: dict) -> str:
-    """s8(1) for a statute subsection, page#3 for the third heading of a guidance page, and
-    the note id for a note."""
+    """s8(1) for a New Zealand subsection, §19(1) for a German paragraph, page#3 for the third
+    heading of a guidance page, and the note id for a note."""
     if "act" in source:
         return f"s{row['section']}" + (f"({row['part']})" if row["part"] else "")
+    if "gii" in source:  # § 19(1), or § 4 Nr. 8 for a numbered item
+        part = row["part"]
+        return f"§{row['section']}" + (
+            f" {part}" if part.startswith("Nr") else f"({part})" if part else ""
+        )
     return f"{row['section']}#{row['part']}" if row["part"] else row["section"]
 
 

@@ -52,3 +52,29 @@ title = "Forum posts and practitioner notes"
 licence = "Written for this project (MIT). Some carry prompt-injection payloads on purpose"
 path = "corpus/nz/notes.jsonl"
 sha256 = "8b105efd24fb810e152f64ae934a3aaf3e39055c17e0e8754eb4748d670ab33e"
+
+[[source]]
+id = "de-ustg"
+tier = "T1"
+jurisdiction = "DE"
+title = "Umsatzsteuergesetz (UStG)"
+gii = "ustg_1980"
+licence = "Amtliches Werk ohne urheberrechtlichen Schutz (§ 5 Abs. 1 UrhG)"
+retrieved = "2026-10-22"
+# One chunk per paragraph; for § 4, only these numbered exemptions.
+sections = ["1", "4", "10", "12", "13", "14", "14b", "15", "16", "18", "19", "20", "22", "28"]
+items = { "4" = ["8", "12", "14", "21"] }
+path = "corpus/de/ustg.jsonl"
+sha256 = "370db4d6e4fd601543e9ba530523fd4c712199353fdd3349e628f93dc975f102"
+
+[[source]]
+id = "de-ustdv"
+tier = "T1"
+jurisdiction = "DE"
+title = "Umsatzsteuer-Durchführungsverordnung (UStDV)"
+gii = "ustdv_1980"
+licence = "Amtliches Werk ohne urheberrechtlichen Schutz (§ 5 Abs. 1 UrhG)"
+retrieved = "2026-10-22"
+sections = ["33"]
+path = "corpus/de/ustdv.jsonl"
+sha256 = "f84127985c2c1b87fc5c935694a0c206aa2ed195d21dc6f160ea7839eac118f5"

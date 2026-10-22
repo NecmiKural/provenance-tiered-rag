@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from provrag import legislation
+from provrag import ingest, legislation
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = tomllib.loads((ROOT / "sources.toml").read_text())["source"]
@@ -62,3 +62,25 @@ def test_every_listed_section_is_in_the_latest_version():
     assert current == set(STATUTE["sections"])
     assert all(r["text"].strip() for r in ROWS)
     assert min(r["valid_from"] for r in ROWS) == STATUTE["first_version"]
+
+
+GERMAN = {s["id"]: legislation.read_jsonl(ROOT / s["path"]) for s in SOURCES if "gii" in s}
+
+
+def de(source: str, section: str, part: str) -> str:
+    """The paragraph as indexing reads it: the law's non-breaking spaces become spaces."""
+    (row,) = [r for r in GERMAN[source] if (r["section"], r["part"]) == (section, part)]
+    return ingest.normalise(row["text"])[0]
+
+
+def test_the_german_rates_and_thresholds_read_as_published():
+    assert "19 Prozent der Bemessungsgrundlage" in de("de-ustg", "12", "1")
+    assert "25 000 Euro" in de("de-ustg", "19", "1") and "100 000 Euro" in de("de-ustg", "19", "1")
+    assert "16 Prozent" in de("de-ustg", "28", "1") and "1. Juli 2020" in de("de-ustg", "28", "1")
+    assert "250 Euro" in de("de-ustdv", "33", "")
+
+
+def test_a_german_consolidation_is_one_version_dated_by_its_last_amendment():
+    for rows in GERMAN.values():
+        assert len({r["valid_from"] for r in rows}) == 1
+        assert all(r["valid_to"] is None and r["text"].strip() for r in rows)

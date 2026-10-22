@@ -14,6 +14,7 @@ from provrag import (
     db,
     embed,
     evaluate,
+    gii,
     guidance,
     ingest,
     latency,
@@ -48,6 +49,9 @@ def cmd_fetch(args: argparse.Namespace) -> None:
             )
         elif "pages" in source:
             rows = guidance.build(source["pages"])
+        elif "gii" in source:
+            items = source.get("items", {})
+            rows = gii.build(source["gii"], {s: items.get(s) for s in source["sections"]})
         else:
             continue
         path = Path(source["path"])
