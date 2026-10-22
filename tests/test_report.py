@@ -31,3 +31,10 @@ def test_only_a_pack_that_asks_for_advice_gets_an_advice_row():
     assert "| Asks to assess the asker's own case: refused | 2 of 2 (100.0%) |" in (
         report.main_table(asked)
     )
+
+
+def test_a_summary_rate_over_no_cases_prints_as_not_available():
+    from provrag import cli
+
+    assert cli.rate3({"k": 0, "n": 0, "rate": None}) == "n/a"
+    assert cli.rate3({"k": 1, "n": 2, "rate": 0.5}) == "0.500"

@@ -80,3 +80,9 @@ Notable mistakes by the coding agent, how they were caught and what changed. The
 - **Proposed:** the number reader learned points, hours, ages and multiples for the immigration pack. Its count pattern read "one points-based skill category" as a count of one point, and its age pattern read a test result "no more than 2 years old" as the age of a person, while "55 years or younger" stayed a period of 55 years.
 - **How it was caught:** auditing the first full set of immigration runs, a correct answer about the 6 points the Points-based pathway needs was scored wrong, with a 1-point figure no cited passage gave; another run's "55 years or younger" failed the same way against passages that say "aged 55".
 - **What changed:** a count unit followed by a hyphen counts nothing, and an age is read only from "aged 55", "55 years of age" and "55 years or younger" or "older". Tests cover the three phrasings. The replay gate shows no New Zealand GST or German decision changed. The immigration runs had not been committed; they were deleted and every setting rerun from the fixed commit.
+
+## 2026-10-22: a held-back run lost to its summary line
+
+- **Proposed:** the immigration payloads all target development questions, so the held-back set has no attacked cases and its attack rates have no value. The command printed its summary line, formatting every rate as a number, before writing the results file.
+- **How it was caught:** the held-back evaluation finished its three runs and stopped with a formatting error; nothing was written and nothing was printed, so no result was seen.
+- **What changed:** a rate with no cases prints as n/a, with a test. The held-back retrieval file from the failed attempt was deleted and both held-back runs were repeated once from the fixed commit. The immigration held-back set measures answers and refusals only; its attacks are measured on the development questions.

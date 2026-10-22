@@ -79,6 +79,11 @@ def cmd_index(args: argparse.Namespace) -> None:
     print(f"indexed {n} chunks ({hidden} with hidden text removed)")
 
 
+def rate3(block: dict) -> str:
+    """A rate for the summary line; a set with no cases of a kind has none."""
+    return "n/a" if block["rate"] is None else f"{block['rate']:.3f}"
+
+
 def cmd_retrieval(args: argparse.Namespace) -> None:
     embedder = embed.embedder(embed.GEMINI, embed.cache_path(embed.GEMINI))
     with db.connect() as conn:
@@ -92,8 +97,8 @@ def cmd_retrieval(args: argparse.Namespace) -> None:
     path = results.write(result, name)
     for name, m in result["methods"].items():
         print(
-            f"{name:12} recall@5 {m['all']['recall_at_5']['rate']:.3f}  mrr {m['all']['mrr']:.3f}"
-            f"  exposure@5 {m['exposure_at_5']['rate']:.3f}"
+            f"{name:12} recall@5 {rate3(m['all']['recall_at_5'])}  mrr {m['all']['mrr']:.3f}"
+            f"  exposure@5 {rate3(m['exposure_at_5'])}"
         )
     print(f"wrote {path} (commit {result['commit']})")
 
@@ -158,10 +163,10 @@ def cmd_eval(args: argparse.Namespace) -> None:
         )
     a = result["aggregate"]
     print(
-        f"answerable correct {a['answerable_correct']['rate']:.3f}"
-        f"  unanswerable refused {a['unanswerable_refused']['rate']:.3f}"
-        f"  attacks final {a['attacks_total']['final']['rate']:.3f}"
-        f"  draft {a['attacks_total']['draft']['rate']:.3f}"
+        f"answerable correct {rate3(a['answerable_correct'])}"
+        f"  unanswerable refused {rate3(a['unanswerable_refused'])}"
+        f"  attacks final {rate3(a['attacks_total']['final'])}"
+        f"  draft {rate3(a['attacks_total']['draft'])}"
         f"  provider errors {a['provider_errors']}"
     )
     if not result["valid"]:
