@@ -16,6 +16,7 @@ from provrag import (
     evaluate,
     guidance,
     ingest,
+    latency,
     legislation,
     report,
     results,
@@ -166,6 +167,18 @@ def cmd_rescore(args: argparse.Namespace) -> None:
         print(f"{path.name}: attacks that succeeded {before} -> {after}")
 
 
+def cmd_latency(args: argparse.Namespace) -> None:
+    embedder = embed.embedder(embed.GEMINI, embed.cache_path(embed.GEMINI))
+    with db.connect() as conn:
+        result = latency.measure(conn, embedder, args.label, args.repeats)
+    path = results.write(result, f"latency-{args.label}")
+    print(
+        f"{args.label}: load {result['load_seconds']} s, query p50 {result['query_p50_ms']} ms,"
+        f" p95 {result['query_p95_ms']} ms (Postgres {result['server_version']},"
+        f" pgvector {result['pgvector']}); wrote {path}"
+    )
+
+
 def cmd_report(args: argparse.Namespace) -> None:
     stale = report.sync(Path("README.md"), Path("results"), check=args.check)
     if args.check and stale:
@@ -203,6 +216,10 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--out", type=Path, default=Path("results"))
     p.add_argument("--name", default=None)
     p.set_defaults(func=cmd_eval)
+    p = sub.add_parser("latency", help="time loading the index and retrieval where it runs")
+    p.add_argument("--label", required=True, help="where it runs, for example local-docker")
+    p.add_argument("--repeats", type=int, default=5)
+    p.set_defaults(func=cmd_latency)
     p = sub.add_parser("rescore", help="recompute aggregates from the recorded runs")
     p.add_argument("--out", type=Path, default=Path("results"))
     p.set_defaults(func=cmd_rescore)

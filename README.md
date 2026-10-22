@@ -177,6 +177,10 @@ uv run provrag fetch                  # rebuild corpus/ from the sites; checksum
 uv run --env-file .env provrag ask "What was the GST rate?" --as-of 2010-09-30
 ```
 
+## Running on Amazon RDS
+
+[`infra/terraform/`](infra/terraform) creates a one-day PostgreSQL 17 trial on Amazon RDS: reachable from one address only, TLS required, the master password kept in Secrets Manager rather than in Terraform state, and a budget alarm. [docs/rds-trial.md](docs/rds-trial.md) is the runbook: create, load the index, run the database tests, the replay gate and `provrag latency` against it, and destroy it the same day. CI checks the Terraform with `fmt` and `validate`; the measured rows appear in the results block once a trial has run.
+
 ## Repository layout
 
 ```
@@ -199,11 +203,13 @@ src/provrag/
   evaluate.py       clean and attacked runs and their scoring
   retrieval_eval.py the retrieval ablation and payload exposure
   gate.py           the CI gate for a replayed slice
+  latency.py        timing the index where it runs
   report.py         the README results block
   cli.py            the provrag command
 tests/              unit, database, gate and README tests; cassettes/ holds the CI slice
 results/            dated results files
-docs/               threat model and agent log
+infra/              Terraform for the RDS trial and its connection script
+docs/               threat model, agent log and the RDS runbook
 ```
 
 ## How this was built

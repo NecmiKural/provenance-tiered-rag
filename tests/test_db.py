@@ -59,3 +59,14 @@ def test_the_reader_cannot_change_the_index(conn, statement):
 def test_role_switch_rejects_unknown_roles(conn):
     with pytest.raises(ValueError), db.as_role(conn, "postgres"):
         pass
+
+
+def test_latency_times_loading_and_queries_on_the_live_database(conn):
+    from provrag import embed, latency
+
+    result = latency.measure(
+        conn, embed.embedder(embed.GEMINI, embed.cache_path(embed.GEMINI)), "test", repeats=1
+    )
+    assert result["label"] == "test" and result["queries"] > 0
+    assert result["load_seconds"] > 0 and 0 < result["query_p50_ms"] <= result["query_p95_ms"]
+    assert result["server_version"].startswith("17") and result["pgvector"]

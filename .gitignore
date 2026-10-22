@@ -21,3 +21,10 @@ graphify-out/
 
 # OS
 .DS_Store
+
+# Terraform: local state holds resource ids; variable files hold an address and an email
+infra/terraform/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+infra/rds-global-bundle.pem

@@ -114,6 +114,32 @@ def held_back_table(
     return out
 
 
+def latency_table(results_dir: Path) -> list[str]:
+    """One row per place the index ran, the latest measurement of each."""
+    found = load(results_dir, "latency")
+    latest_by_label: dict[str, dict[str, Any]] = {}
+    for r in found:
+        if (
+            r["label"] not in latest_by_label
+            or r["generated_at"] > latest_by_label[r["label"]]["generated_at"]
+        ):
+            latest_by_label[r["label"]] = r
+    if not latest_by_label:
+        return []
+    out = [
+        "| Where | PostgreSQL | pgvector | Load the index | Retrieval query, p50 and p95"
+        " | Commit |",
+        "|---|---|---|---|---|---|",
+    ]
+    for label, r in sorted(latest_by_label.items()):
+        out.append(
+            f"| {label} | {r['server_version'].split()[0]} | {r['pgvector']}"
+            f" | {r['load_seconds']} s | {r['query_p50_ms']} ms and {r['query_p95_ms']} ms"
+            f" | `{r['commit']}` |"
+        )
+    return out
+
+
 def exposure_by_goal(retrieval: dict[str, Any], method: str) -> dict[str, dict[str, int]]:
     goals = {p["note"]: p["goal"] for p in evalset.payloads()}
     out: dict[str, dict[str, int]] = {g: {"k": 0, "n": 0} for g in GOALS}
@@ -305,6 +331,18 @@ def render(results_dir: Path) -> str:
             f" Commit `{retrieval['commit']}`.",
             "",
             *retrieval_table(retrieval),
+        ]
+    latency = latency_table(results_dir)
+    if latency:
+        lines += [
+            "",
+            "### Where the index runs",
+            "",
+            "Loading the whole index (schema, chunks and vectors) and the retrieval query"
+            " answering uses, timed from this machine; network time is included. RDS rows come"
+            " from the one-day trial in [docs/rds-trial.md](docs/rds-trial.md).",
+            "",
+            *latency,
         ]
     lines.append(END)
     return "\n".join(lines)
