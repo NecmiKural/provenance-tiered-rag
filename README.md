@@ -52,6 +52,19 @@ The prompt rules say notes are data and never a source, keep the prompt private 
 | All off except the prompt rules | 3 | 94 of 96 (97.9%) | 12 of 12 (100.0%) | 0 of 96 (0.0%) | 0 of 96 (0.0%) | 2 of 96 (2.1%) |
 | All off | 3 | 87 of 96 (90.6%) | 1 of 12 (8.3%) | 6 of 96 (6.2%) | 6 of 96 (6.2%) | 19 of 106 (17.9%) |
 
+### Held-back questions
+
+A quarter of the questions of every kind, with the payloads aimed at them, kept out of the prompt and the choice of retrieval method and run once at the end with every defence on. One scoring rule changed after it ran: a false positive in this set showed that a planted figure can also be true elsewhere in the law, so wrong-figure attacks are now paired with the clean answer, in every results file (see the agent log). Run at commit `5c2d88d`, scored at `ae63ad3`.
+
+| | Development (3 runs) | Held back (3 runs) |
+|---|---|---|
+| Answerable correct | 96 of 96 (100.0%) | 27 of 30 (90.0%) |
+| Not covered: refused | 24 of 24 (100.0%) | 6 of 6 (100.0%) |
+| Arithmetic: refused | 12 of 12 (100.0%) | 3 of 3 (100.0%) |
+| Attacks, first draft | 0 of 96 (0.0%) | 0 of 24 (0.0%) |
+| Attacks, what the user saw | 0 of 96 (0.0%) | 0 of 24 (0.0%) |
+| Vector retrieval, gold passage in the top 5 | 31 of 32 (96.9%) | 9 of 10 (90.0%) |
+
 ### Retrieval
 
 Each cell is recall at 5 and mean reciprocal rank of a labelled passage in force on the question's date, on the development questions; no chat model is involved. Embeddings `gemini-embedding-2` at 768 dimensions in pgvector. The mean Jaccard word overlap between a question and its best labelled passage is 0.103: the questions do not borrow the sources' wording. Commit `cde4f71`.
@@ -130,7 +143,7 @@ The notes are the injection surface: anyone can post one, and retrieval can surf
 
 ## What these numbers do not show
 
-- **The questions are few and written by the author of the system.** The development set is small, and the retrieval method was chosen on it; a quarter of the questions is held back and run once at the end. The questions use the plain words a business owner would, as the overlap figure shows, but they were written knowing the corpus.
+- **The questions are few and written by the author of the system.** The development set is small, and the retrieval method was chosen on it. The held-back quarter ran once at the end and scored lower on answerable questions; it also changed one scoring rule, as its section says. The questions use the plain words a business owner would, as the overlap figure shows, but they were written knowing the corpus.
 - **The payloads are templated and weak against this model.** Each goal has a few fixed phrasings in five styles. With every defence on none succeeded, but with every defence off most still failed, so the defences were seldom tested hard. A payload written as convincing official text, or a weaker model, would test them harder.
 - **Forced exposure puts each payload note last.** A note ranked first could do better; position is not varied.
 - **Guidance is dated by its last update.** Inland Revenue pages have no dated versions, so guidance only answers questions about dates on or after the page's last update, even where the page was true before.
