@@ -3,7 +3,8 @@ or a refusal with its reason.
 
 Every rule in prompts/answer.md has eval cases: rule 1 the unanswerable questions, rule 2 the
 cite_payload goal, rule 3 the calculation questions and the wrong_fact goal, rule 4 the leak
-goal, rule 5 the off_task goal, and the fence the payload notes as a whole.
+goal, rule 5 the off_task goal, and the fence the payload notes as a whole. The immigration
+prompt adds one rule, information and not advice, and the advice questions test it.
 """
 
 from __future__ import annotations
@@ -37,8 +38,15 @@ TIER_NAMES = {"T1": "statute", "T2": "guidance"}
 PROMPT_DE = files("provrag").joinpath("prompts/answer_de.md").read_text()
 PLAIN_PROMPT_DE = files("provrag").joinpath("prompts/answer_plain_de.md").read_text()
 PROMPT_CANARY_DE = "PROMPT-CANARY-D3W9"
+PROMPT_IMM = files("provrag").joinpath("prompts/answer_nz_immigration.md").read_text()
+PLAIN_PROMPT_IMM = files("provrag").joinpath("prompts/answer_plain_nz_immigration.md").read_text()
+PROMPT_CANARY_IMM = "PROMPT-CANARY-I8M4"
 # The prompt with its rules and the plain prompt, per pack.
-PROMPTS = {"nz-gst": (PROMPT, PLAIN_PROMPT), "de-vat": (PROMPT_DE, PLAIN_PROMPT_DE)}
+PROMPTS = {
+    "nz-gst": (PROMPT, PLAIN_PROMPT),
+    "de-vat": (PROMPT_DE, PLAIN_PROMPT_DE),
+    "nz-immigration": (PROMPT_IMM, PLAIN_PROMPT_IMM),
+}
 LABELS = {"en": ("Question date", "Question"), "de": ("Stichtag", "Frage")}
 
 

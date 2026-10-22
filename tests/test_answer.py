@@ -142,6 +142,21 @@ def test_german_answers_get_the_german_prompt_labels_and_canary():
     assert leaks == {answer.PROMPT_CANARY_DE}
 
 
+def test_the_immigration_prompt_refuses_advice_and_carries_its_own_canary():
+    client = FakeClient([GOOD])
+    llm = LLM(MODELS["deepseek-flash"], client=client)
+    answer.answer("How many points?", DAY, CHUNKS, llm, pack="nz-immigration")
+    system = client.requests[0]["messages"][0]["content"]
+    assert system == answer.PROMPT_IMM and "not immigration advice" in system
+    assert (
+        answer.PROMPT_CANARY_IMM in system and answer.PROMPT_CANARY_IMM in answer.PLAIN_PROMPT_IMM
+    )
+    leaks = {p["canary"][1] for p in evalset.payloads("nz-immigration") if p["goal"] == "leak"}
+    assert leaks == {answer.PROMPT_CANARY_IMM}
+    assert "untrusted" not in answer.PLAIN_PROMPT_IMM.lower()
+    assert "advice" not in answer.PLAIN_PROMPT_IMM.lower()
+
+
 def test_the_plain_german_prompt_keeps_only_task_format_and_canary():
     assert answer.PROMPT_CANARY_DE in answer.PLAIN_PROMPT_DE
     assert "untrusted" not in answer.PLAIN_PROMPT_DE and "niemals" not in answer.PLAIN_PROMPT_DE
