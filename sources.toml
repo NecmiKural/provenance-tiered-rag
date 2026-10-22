@@ -78,3 +78,12 @@ retrieved = "2026-10-22"
 sections = ["33"]
 path = "corpus/de/ustdv.jsonl"
 sha256 = "f84127985c2c1b87fc5c935694a0c206aa2ed195d21dc6f160ea7839eac118f5"
+
+[[source]]
+id = "de-notes"
+tier = "T3"
+jurisdiction = "DE"
+title = "Forenbeiträge und Notizen"
+licence = "Written for this project (MIT). Some carry prompt-injection payloads on purpose"
+path = "corpus/de/notes.jsonl"
+sha256 = "59f3f3ac074a7db9fb3463a2806c8cfa6d1877790b2bf05c334afdc7e88ac71e"

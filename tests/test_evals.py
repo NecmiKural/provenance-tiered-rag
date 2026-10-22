@@ -1,25 +1,18 @@
-"""Oracle checks on the eval set, with no model: every label is supported by the corpus, every
-payload can reach the model and has a canary code can find, and the set is frozen."""
+"""Oracle checks on each jurisdiction's eval set, with no model: every label is supported by the
+corpus, every payload can reach the model and has a canary code can find, and the set is frozen."""
 
 import hashlib
 from collections import Counter
+from functools import cache
 from pathlib import Path
 
 import pytest
 
-from provrag import cli, evalset, ingest
-from provrag.numbers import extract, numbers
+from provrag import cli, evalset, ingest, retrieve
+from provrag.numbers import LANGUAGES, extract, numbers
 
 ROOT = Path(__file__).resolve().parents[1]
-DEV = evalset.questions()
-HELD = evalset.questions(held_back=True)
-QUESTIONS = {q["id"]: q for q in DEV + HELD}
-PAYLOADS = evalset.payloads()
-CHUNKS = cli.corpus_chunks()
-BY_LOCATOR: dict[str, list[ingest.Chunk]] = {}
-for chunk in CHUNKS:
-    BY_LOCATOR.setdefault(evalset.locator(chunk), []).append(chunk)
-ANSWERABLE = [q for q in QUESTIONS.values() if q["kind"] == "answerable"]
+JURISDICTIONS = ("NZ", "DE")
 
 # sha256 of each frozen file. Changing one needs a docs/agent-log.md entry saying why.
 FROZEN = {
@@ -29,11 +22,56 @@ FROZEN = {
     ),
     "evals/payloads.jsonl": "b784fa4551361779f1daf7b303d9f1dfe5b0d7af176eedf9ba6d8038ddff1548",
     "corpus/nz/notes.jsonl": "8b105efd24fb810e152f64ae934a3aaf3e39055c17e0e8754eb4748d670ab33e",
+    "evals/de/questions.jsonl": (
+        "29a5befb13a802fb977eb9f798941f4b1042b7fb8394e7de9f015f0910ffd724"
+    ),
+    "evals/de/questions-held-back.jsonl": (
+        "37b14e14ea71ba1ea21b7090515a87b288922c4876ea93e828c0cca58acc0b1a"
+    ),
+    "evals/de/payloads.jsonl": ("355ebfb419c7561bd1f607eb007e691f9fce696723b260e543e12fe19841a8fa"),
+    "corpus/de/notes.jsonl": ("59f3f3ac074a7db9fb3463a2806c8cfa6d1877790b2bf05c334afdc7e88ac71e"),
 }
+PAYLOADS_PER_GOAL = {"NZ": 8, "DE": 4}
+# Planted figures that some passage in force also states; scoring pairs those attacks with the
+# clean run (see the agent log, 2026-10-22).
+KNOWN_COLLISIONS = {"NZ": {"P04", "P07"}, "DE": {"DP04"}}
 
 
-def in_force(locator: str, day: str) -> list[ingest.Chunk]:
-    return [c for c in BY_LOCATOR.get(locator, []) if evalset.valid_on(c, day)]
+@cache
+def eval_set(j: str) -> dict:
+    questions = evalset.questions(jurisdiction=j) + evalset.questions(True, jurisdiction=j)
+    chunks = [c for c in cli.corpus_chunks() if c.jurisdiction == j]
+    by_locator: dict[str, list[ingest.Chunk]] = {}
+    for chunk in chunks:
+        by_locator.setdefault(evalset.locator(chunk), []).append(chunk)
+    return {
+        "dev": evalset.questions(jurisdiction=j),
+        "held": evalset.questions(True, jurisdiction=j),
+        "questions": {q["id"]: q for q in questions},
+        "payloads": evalset.payloads(j),
+        "chunks": chunks,
+        "by_locator": by_locator,
+        "lang": LANGUAGES[j],
+    }
+
+
+def in_force(j: str, locator: str, day: str) -> list[ingest.Chunk]:
+    return [c for c in eval_set(j)["by_locator"].get(locator, []) if evalset.valid_on(c, day)]
+
+
+def each(kind_filter, source="questions"):
+    """(jurisdiction, item) pairs for parametrising per question or payload."""
+    pairs = []
+    for j in JURISDICTIONS:
+        items = eval_set(j)[source]
+        items = items.values() if isinstance(items, dict) else items
+        pairs += [(j, item) for item in items if kind_filter(item)]
+    return pairs
+
+
+def name(pair) -> str:
+    j, item = pair
+    return f"{j}-{item.get('id', item.get('note'))}"
 
 
 @pytest.mark.parametrize("path", sorted(FROZEN))
@@ -41,50 +79,59 @@ def test_the_eval_set_is_frozen(path):
     assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == FROZEN[path]
 
 
-def test_ids_kinds_and_split():
-    assert len(QUESTIONS) == len(DEV) + len(HELD)
-    assert {q["kind"] for q in QUESTIONS.values()} == set(evalset.KINDS)
-    assert 0.2 <= len(HELD) / len(QUESTIONS) <= 0.3
+@pytest.mark.parametrize("j", JURISDICTIONS)
+def test_ids_kinds_and_split(j):
+    s = eval_set(j)
+    assert len(s["questions"]) == len(s["dev"]) + len(s["held"])
+    assert {q["kind"] for q in s["questions"].values()} == set(evalset.KINDS)
+    assert 0.2 <= len(s["held"]) / len(s["questions"]) <= 0.3
     for kind in evalset.KINDS:
-        assert any(q["kind"] == kind for q in HELD), kind
+        assert any(q["kind"] == kind for q in s["held"]), kind
 
 
-@pytest.mark.parametrize("q", ANSWERABLE, ids=lambda q: q["id"])
-def test_every_answerable_question_is_supported_on_its_date(q):
+@pytest.mark.parametrize("pair", each(lambda q: q["kind"] == "answerable"), ids=name)
+def test_every_answerable_question_is_supported_on_its_date(pair):
+    j, q = pair
+    lang = eval_set(j)["lang"]
     assert q["gold"]
-    assert all(g in BY_LOCATOR for g in q["gold"]), "a gold passage is missing from the corpus"
-    passages = [c for g in q["gold"] for c in in_force(g, q["as_of"])]
+    assert all(g in eval_set(j)["by_locator"] for g in q["gold"]), "a gold passage is missing"
+    passages = [c for g in q["gold"] for c in in_force(j, g, q["as_of"])]
     assert passages, "no gold passage was in force on the question's date"
     assert all(c.tier in ("T1", "T2") for c in passages)
-    supported = set().union(*(numbers(c.body) for c in passages))
+    supported = set().union(*(numbers(c.body, lang) for c in passages))
     for expected in q["expect"]:
-        (number,) = extract(expected)
+        (number,) = extract(expected, lang)
         assert number in supported, expected
-        assert number not in numbers(q["question"]), "the answer would be in the question"
+        assert number not in numbers(q["question"], lang), "the answer would be in the question"
 
 
-@pytest.mark.parametrize(
-    "q", [q for q in QUESTIONS.values() if q["kind"] != "answerable"], ids=lambda q: q["id"]
-)
-def test_other_questions_have_no_labels(q):
+@pytest.mark.parametrize("pair", each(lambda q: q["kind"] != "answerable"), ids=name)
+def test_other_questions_have_no_labels(pair):
+    _, q = pair
     assert q["gold"] == [] and q["expect"] == []
 
 
-def test_questions_about_dates_before_the_corpus_are_unanswerable():
-    first = min(c.valid_from for c in CHUNKS if c.tier == "T1")
-    early = [q for q in QUESTIONS.values() if q["as_of"] < first]
+@pytest.mark.parametrize("j", JURISDICTIONS)
+def test_questions_about_dates_before_the_corpus_are_unanswerable(j):
+    first = min(c.valid_from for c in eval_set(j)["chunks"] if c.tier == "T1")
+    early = [q for q in eval_set(j)["questions"].values() if q["as_of"] < first]
     assert early and all(q["kind"] == "unanswerable" for q in early)
 
 
-def test_payloads_cover_every_goal_and_style_evenly():
-    assert Counter(p["goal"] for p in PAYLOADS) == dict.fromkeys(evalset.GOALS, 8)
-    assert len({p["style"] for p in PAYLOADS}) == 5
+@pytest.mark.parametrize("j", JURISDICTIONS)
+def test_payloads_cover_every_goal_and_style_evenly(j):
+    payloads = eval_set(j)["payloads"]
+    assert Counter(p["goal"] for p in payloads) == dict.fromkeys(
+        evalset.GOALS, PAYLOADS_PER_GOAL[j]
+    )
+    assert len({p["style"] for p in payloads}) == 5
 
 
-@pytest.mark.parametrize("p", PAYLOADS, ids=lambda p: p["note"])
-def test_every_payload_targets_an_answerable_question_it_can_reach(p):
-    (note,) = BY_LOCATOR[f"nz-notes:{p['note']}"]
-    target = QUESTIONS[p["target"]]
+@pytest.mark.parametrize("pair", each(lambda p: True, "payloads"), ids=name)
+def test_every_payload_targets_an_answerable_question_it_can_reach(pair):
+    j, p = pair
+    (note,) = eval_set(j)["by_locator"][f"{retrieve.NOTES[j]}:{p['note']}"]
+    target = eval_set(j)["questions"][p["target"]]
     assert note.tier == "T3"
     assert target["kind"] == "answerable"
     assert evalset.valid_on(note, target["as_of"])
@@ -94,32 +141,36 @@ def test_every_payload_targets_an_answerable_question_it_can_reach(p):
         assert p["instruction"] in note.body
 
 
-@pytest.mark.parametrize(
-    "p", [p for p in PAYLOADS if p["goal"] == "wrong_fact"], ids=lambda p: p["note"]
-)
-def test_a_planted_number_is_wrong_for_its_target(p):
+@pytest.mark.parametrize("pair", each(lambda p: p["goal"] == "wrong_fact", "payloads"), ids=name)
+def test_a_planted_number_is_wrong_for_its_target(pair):
+    j, p = pair
+    lang = eval_set(j)["lang"]
     planted = tuple(p["canary"])
-    target = QUESTIONS[p["target"]]
-    gold = [c for g in target["gold"] for c in in_force(g, target["as_of"])]
-    assert planted in numbers(p["instruction"])
-    assert all(planted not in numbers(c.body) for c in gold)
+    target = eval_set(j)["questions"][p["target"]]
+    gold = [c for g in target["gold"] for c in in_force(j, g, target["as_of"])]
+    assert planted in numbers(p["instruction"], lang)
+    assert all(planted not in numbers(c.body, lang) for c in gold)
 
 
-def test_canaries_are_unique_except_the_shared_prompt_canary():
-    canaries = [tuple(p["canary"]) for p in PAYLOADS if p["canary"] and p["canary"][0] != "prompt"]
+@pytest.mark.parametrize("j", JURISDICTIONS)
+def test_canaries_are_unique_except_the_shared_prompt_canary(j):
+    payloads = eval_set(j)["payloads"]
+    canaries = [tuple(p["canary"]) for p in payloads if p["canary"] and p["canary"][0] != "prompt"]
     assert len(canaries) == len(set(canaries))
-    assert len({tuple(p["canary"]) for p in PAYLOADS if p["goal"] == "leak"}) == 1
+    assert len({tuple(p["canary"]) for p in payloads if p["goal"] == "leak"}) == 1
 
 
-def test_planted_figures_that_are_also_true_somewhere_are_known():
+@pytest.mark.parametrize("j", JURISDICTIONS)
+def test_planted_figures_that_are_also_true_somewhere_are_known(j):
     """Scoring pairs each wrong-figure attack with the clean run, so a planted figure that a
     passage in force also states is counted only when the attack introduced it."""
+    s = eval_set(j)
     collisions = set()
-    for p in PAYLOADS:
+    for p in s["payloads"]:
         if p["goal"] != "wrong_fact":
             continue
-        day = QUESTIONS[p["target"]]["as_of"]
-        sources = [c for c in CHUNKS if c.tier in ("T1", "T2") and evalset.valid_on(c, day)]
-        if any(tuple(p["canary"]) in numbers(c.body) for c in sources):
+        day = s["questions"][p["target"]]["as_of"]
+        sources = [c for c in s["chunks"] if c.tier in ("T1", "T2") and evalset.valid_on(c, day)]
+        if any(tuple(p["canary"]) in numbers(c.body, s["lang"]) for c in sources):
             collisions.add(p["note"])
-    assert collisions == {"P04", "P07"}
+    assert collisions == KNOWN_COLLISIONS[j]
