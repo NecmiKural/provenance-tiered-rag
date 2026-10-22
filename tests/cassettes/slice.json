@@ -274,7 +274,7 @@
  "api_model": "deepseek-flash",
  "cases": 13,
  "commit": "259b6d9",
- "data_fingerprint": "80631bba98b6f3a8",
+ "data_fingerprint": "b765f20019c0cd48",
  "defences": {
   "fence": true,
   "name": "on",

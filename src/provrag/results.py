@@ -7,6 +7,7 @@ import hashlib
 import json
 import math
 import subprocess
+import tomllib
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -49,22 +50,28 @@ def git_commit() -> str:
     return f"{head}-dirty" if dirty else head
 
 
-def fingerprint(root: Path = Path(".")) -> str:
-    """sha256 over every data file, so a result names the exact corpus and eval set."""
+def fingerprint(jurisdiction: str = "NZ", root: Path = Path(".")) -> str:
+    """sha256 over the data a run in one jurisdiction reads: each of its sources as listed in
+    sources.toml with the file it points to, and its eval files. Data added for another
+    jurisdiction does not change it."""
+    sources = tomllib.loads((root / "sources.toml").read_text())["source"]
+    evals = root / ("evals" if jurisdiction == "NZ" else f"evals/{jurisdiction.lower()}")
     digest = hashlib.sha256()
-    for name in DATA:
-        top = root / name
-        for path in [top] if top.is_file() else sorted(p for p in top.rglob("*") if p.is_file()):
-            digest.update(str(path.relative_to(root)).encode() + b"\0" + path.read_bytes())
+    for source in (s for s in sources if s["jurisdiction"] == jurisdiction):
+        digest.update(json.dumps(source, sort_keys=True).encode() + b"\0")
+        digest.update((root / source["path"]).read_bytes())
+    for path in sorted(evals.glob("*.jsonl")):
+        digest.update(path.name.encode() + b"\0" + path.read_bytes())
     return digest.hexdigest()[:16]
 
 
-def stamp(kind: str) -> dict[str, Any]:
+def stamp(kind: str, jurisdiction: str = "NZ") -> dict[str, Any]:
     return {
         "kind": kind,
         "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "commit": git_commit(),
-        "data_fingerprint": fingerprint(),
+        "jurisdiction": jurisdiction,
+        "data_fingerprint": fingerprint(jurisdiction),
     }
 
 
