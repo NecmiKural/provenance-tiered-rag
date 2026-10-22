@@ -99,7 +99,7 @@ def build_cases(
     cases = [Case(q["id"], q, None, context[q["id"]]) for q in questions]
     for p in evalset.payloads(jurisdiction):
         if p["target"] in by_id:
-            note = payload_chunk(p["note"], chunks, defences.normalise)
+            note = payload_chunk(p["note"], chunks, defences.normalise, jurisdiction)
             cases.append(
                 Case(
                     f"{p['target']}+{p['note']}",

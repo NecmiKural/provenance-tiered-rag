@@ -36,3 +36,15 @@ def test_a_note_is_retrieved_only_when_visible(conn):
 def test_an_unknown_method_is_refused(conn):
     with pytest.raises(ValueError):
         retrieve.search(conn, RATE, vector(RATE), "2010-09-30", [], method="bm25")
+
+
+def test_german_cases_are_built_from_german_questions_and_notes(conn):
+    from provrag import answer, evaluate
+
+    embedder = embed.embedder(embed.GEMINI, embed.cache_path(embed.GEMINI))
+    cases = evaluate.build_cases(conn, embedder, answer.DEFENCES["on"], jurisdiction="DE")
+    attacked = [c for c in cases if c.payload]
+    assert cases and attacked
+    assert all(c.question["jurisdiction"] == "DE" for c in cases)
+    assert all(ch.jurisdiction == "DE" for c in cases for ch in c.chunks)
+    assert all(c.chunks[-1].source == "de-notes" for c in attacked)
