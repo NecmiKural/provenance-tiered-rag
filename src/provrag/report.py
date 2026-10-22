@@ -57,11 +57,20 @@ def upper(block: dict[str, Any]) -> str:
     return pct(block["ci95"][1])
 
 
-def evals(results_dir: Path) -> dict[str, dict[str, Any]]:
+def of(results: list[dict[str, Any]], jurisdiction: str) -> list[dict[str, Any]]:
+    """Files written before jurisdictions existed are New Zealand's."""
+    return [r for r in results if r.get("jurisdiction", "NZ") == jurisdiction]
+
+
+def evals(results_dir: Path, jurisdiction: str = "NZ") -> dict[str, dict[str, Any]]:
     out = {}
     for name in ABLATIONS:
         r = latest(
-            [r for r in load(results_dir, "eval") if r["defences"]["name"] == name],
+            [
+                r
+                for r in of(load(results_dir, "eval"), jurisdiction)
+                if r["defences"]["name"] == name
+            ],
             questions="development",
             mode="record",
             every=1,
@@ -72,13 +81,17 @@ def evals(results_dir: Path) -> dict[str, dict[str, Any]]:
     return out
 
 
-def held_back(results_dir: Path) -> dict[str, Any] | None:
-    found = [r for r in load(results_dir, "eval") if r["defences"]["name"] == "on"]
+def held_back(results_dir: Path, jurisdiction: str = "NZ") -> dict[str, Any] | None:
+    found = [
+        r for r in of(load(results_dir, "eval"), jurisdiction) if r["defences"]["name"] == "on"
+    ]
     return latest(found, questions="held_back", mode="record", every=1, valid=True)
 
 
-def retrievals(results_dir: Path, questions: str) -> dict[str, Any] | None:
-    found = load(results_dir, "retrieval")
+def retrievals(
+    results_dir: Path, questions: str, jurisdiction: str = "NZ"
+) -> dict[str, Any] | None:
+    found = of(load(results_dir, "retrieval"), jurisdiction)
     return latest([r for r in found if r.get("questions", "development") == questions])
 
 

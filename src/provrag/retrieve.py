@@ -17,7 +17,8 @@ from provrag.embed import vector_literal
 
 RRF_K = 60
 METHODS = ("full_text", "vector", "rrf")
-NOTES_SOURCE = "nz-notes"
+NOTES = {"NZ": "nz-notes", "DE": "de-notes"}  # the untrusted-notes source of each jurisdiction
+NOTES_SOURCE = NOTES["NZ"]
 
 # Full-text matching is an OR over the question's stemmed lexemes, quoted so no word can be
 # read as query syntax: a question rarely shares every word with the passage that answers it.
@@ -82,7 +83,7 @@ def search(
         "day": day,
         "dated": dated,
         "notes": notes,
-        "notes_source": NOTES_SOURCE,
+        "notes_source": NOTES[jurisdiction],
         "jurisdiction": jurisdiction,
         "method": method,
         "rrf_k": RRF_K,

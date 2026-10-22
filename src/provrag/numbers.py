@@ -8,7 +8,8 @@ months) and a day of the month ("the 28th").
 Section references ("s 8(1)", "section 51", "subsection (2)") and paragraph labels are not
 numbers here, and bare figures without a kind are ignored.
 
-NOTE: pattern based, written for New Zealand English statute and guidance text. It reads
+NOTE: pattern based, written for New Zealand English statute and guidance text; German text
+goes to numbers_de. It reads
 numbers in words only from one to twelve, a range such as "$1,000 to $5,000" comes out as two
 numbers, and a figure written two ways ("$2 million", "$2,000,000") is one number by value.
 """
@@ -96,9 +97,14 @@ def _read(kind: str, g: tuple[str, ...]) -> Number:
     return "day_of_month", str(int(g[0]))
 
 
-def extract(text: str) -> list[Number]:
+def extract(text: str, lang: str = "en") -> list[Number]:
     """Typed numbers in the order they appear. Patterns run from the most specific, and each
-    span of text is read once, so "1 October 2010" is a date and not also a day and month."""
+    span of text is read once, so "1 October 2010" is a date and not also a day and month.
+    German text has its own reader, with the same kinds."""
+    if lang == "de":
+        from provrag import numbers_de
+
+        return numbers_de.extract(text)
     text = _LABELS.sub(" ", _REFERENCES.sub(" ", text))
     found: list[tuple[int, Number]] = []
     for kind, pattern in _PATTERNS:
@@ -111,5 +117,8 @@ def extract(text: str) -> list[Number]:
     return [n for _, n in sorted(found)]
 
 
-def numbers(text: str) -> set[Number]:
-    return set(extract(text))
+def numbers(text: str, lang: str = "en") -> set[Number]:
+    return set(extract(text, lang))
+
+
+LANGUAGES = {"NZ": "en", "DE": "de"}  # the language each jurisdiction's sources are written in

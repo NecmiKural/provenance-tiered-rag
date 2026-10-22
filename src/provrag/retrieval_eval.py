@@ -60,21 +60,32 @@ def summarise(ranks: dict[str, int | None], ids: list[str]) -> dict[str, Any]:
     }
 
 
-def run(conn: psycopg.Connection, embed: Embedder, held_back: bool = False) -> dict[str, Any]:
+def run(
+    conn: psycopg.Connection, embed: Embedder, held_back: bool = False, jurisdiction: str = "NZ"
+) -> dict[str, Any]:
     chunks = {c.id: c for c in cli.corpus_chunks()}
-    questions = evalset.questions(held_back)
+    questions = evalset.questions(held_back, jurisdiction)
     answerable = [q for q in questions if q["kind"] == "answerable"]
     by_id = {q["id"]: q for q in questions}
-    payloads = [p for p in evalset.payloads() if p["target"] in by_id]
-    planted = {p["note"] for p in evalset.payloads()}
-    benign = sorted(c.section for c in chunks.values() if c.source == retrieve.NOTES_SOURCE)
+    payloads = [p for p in evalset.payloads(jurisdiction) if p["target"] in by_id]
+    planted = {p["note"] for p in evalset.payloads(jurisdiction)}
+    notes_source = retrieve.NOTES[jurisdiction]
+    benign = sorted(c.section for c in chunks.values() if c.source == notes_source)
     benign = [n for n in benign if n not in planted]
     vectors = embed([q["question"] for q in questions])
 
     def hits(q: dict, notes: list[str], method: str, dated: bool, k: int) -> list[retrieve.Hit]:
         vector = vectors[q["question"]]
         return retrieve.search(
-            conn, q["question"], vector, q["as_of"], notes, method=method, k=k, dated=dated
+            conn,
+            q["question"],
+            vector,
+            q["as_of"],
+            notes,
+            method=method,
+            k=k,
+            dated=dated,
+            jurisdiction=jurisdiction,
         )
 
     current = max(q["as_of"] for q in answerable)
@@ -114,7 +125,7 @@ def run(conn: psycopg.Connection, embed: Embedder, held_back: bool = False) -> d
         q["id"]: round(overlap(q["question"], gold_passages[q["id"]]), 4) for q in answerable
     }
     return {
-        **stamp("retrieval"),
+        **stamp("retrieval", jurisdiction),
         "questions": "held_back" if held_back else "development",
         "embedding_model": GEMINI.name,
         "dims": GEMINI.dims,

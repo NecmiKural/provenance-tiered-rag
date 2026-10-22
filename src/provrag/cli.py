@@ -80,8 +80,13 @@ def cmd_retrieval(args: argparse.Namespace) -> None:
     with db.connect() as conn:
         db.reset(conn)
         ingest.load(conn, corpus_chunks(), embedder)
-        result = retrieval_eval.run(conn, embedder, args.held_back)
-    path = results.write(result, "retrieval-held-back" if args.held_back else "retrieval")
+        result = retrieval_eval.run(conn, embedder, args.held_back, args.jurisdiction)
+    name = "-".join(
+        ["retrieval"]
+        + ([] if args.jurisdiction == "NZ" else [args.jurisdiction.lower()])
+        + (["held-back"] if args.held_back else [])
+    )
+    path = results.write(result, name)
     for name, m in result["methods"].items():
         print(
             f"{name:12} recall@5 {m['all']['recall_at_5']['rate']:.3f}  mrr {m['all']['mrr']:.3f}"
@@ -93,17 +98,21 @@ def cmd_retrieval(args: argparse.Namespace) -> None:
 def cmd_ask(args: argparse.Namespace) -> None:
     """Retrieve, answer and verify one question against the index `provrag index` built."""
     chunks = {c.id: c for c in corpus_chunks()}
-    notes = sorted({c.section for c in chunks.values() if c.source == retrieve.NOTES_SOURCE})
+    source = retrieve.NOTES[args.jurisdiction]
+    notes = sorted({c.section for c in chunks.values() if c.source == source})
     embedder = embed.embedder(embed.GEMINI, embed.cache_path(embed.GEMINI))
     vector = embedder([args.question])[args.question]
     with db.connect() as conn:
-        hits = retrieve.search(conn, args.question, vector, args.as_of, notes, k=args.k)
+        hits = retrieve.search(
+            conn, args.question, vector, args.as_of, notes, k=args.k, jurisdiction=args.jurisdiction
+        )
     outcome = answer.answer(
         args.question,
         args.as_of,
         [chunks[h.id] for h in hits],
         LLM(MODELS[args.model]),
         answer.DEFENCES[args.defences],
+        args.jurisdiction,
     )
     final = outcome.answer
     if final.refused:
@@ -121,6 +130,7 @@ def cmd_ask(args: argparse.Namespace) -> None:
 def cmd_eval(args: argparse.Namespace) -> None:
     defences = answer.DEFENCES[args.defences]
     parts = ["eval", args.model.replace(":", "_"), defences.name]
+    parts += [] if args.jurisdiction == "NZ" else [args.jurisdiction.lower()]
     parts += ["held-back"] if args.held_back else []
     parts += [f"every{args.every}"] if args.every > 1 else []
     name = args.name or "-".join([*parts, args.mode])
@@ -140,6 +150,7 @@ def cmd_eval(args: argparse.Namespace) -> None:
             args.workers,
             args.every,
             args.held_back,
+            args.jurisdiction,
         )
     a = result["aggregate"]
     print(
@@ -164,7 +175,7 @@ def cmd_rescore(args: argparse.Namespace) -> None:
         if result.get("kind") != "eval":
             continue
         before = result["aggregate"]["attacks_total"]["final"]["k"]
-        result["aggregate"] = evaluate.aggregate(result["runs"])
+        result["aggregate"] = evaluate.aggregate(result["runs"], result.get("jurisdiction", "NZ"))
         result["scored_with"] = scored_with
         path.write_text(json.dumps(result, indent=1, sort_keys=True) + "\n")
         after = result["aggregate"]["attacks_total"]["final"]["k"]
@@ -200,6 +211,7 @@ def main(argv: list[str] | None = None) -> None:
     p.set_defaults(func=cmd_index)
     p = sub.add_parser("retrieval", help="the retrieval ablation; writes results/*.json")
     p.add_argument("--held-back", action="store_true", help="the held-back questions, once")
+    p.add_argument("--jurisdiction", choices=sorted(retrieve.NOTES), default="NZ")
     p.set_defaults(func=cmd_retrieval)
     p = sub.add_parser("ask", help="answer one question, with citations checked in code")
     p.add_argument("question")
@@ -207,6 +219,7 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--model", choices=sorted(MODELS), default="deepseek-flash")
     p.add_argument("--defences", choices=sorted(answer.DEFENCES), default="on")
     p.add_argument("--k", type=int, default=retrieval_eval.K)
+    p.add_argument("--jurisdiction", choices=sorted(retrieve.NOTES), default="NZ")
     p.set_defaults(func=cmd_ask)
     p = sub.add_parser("eval", help="clean and attacked runs, repeated; writes results/*.json")
     p.add_argument("--model", choices=sorted(MODELS), default="deepseek-flash")
@@ -219,6 +232,7 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--held-back", action="store_true", help="the held-back questions, once")
     p.add_argument("--out", type=Path, default=Path("results"))
     p.add_argument("--name", default=None)
+    p.add_argument("--jurisdiction", choices=sorted(retrieve.NOTES), default="NZ")
     p.set_defaults(func=cmd_eval)
     p = sub.add_parser("latency", help="time loading the index and retrieval where it runs")
     p.add_argument("--label", required=True, help="where it runs, for example local-docker")

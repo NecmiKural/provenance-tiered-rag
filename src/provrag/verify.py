@@ -47,6 +47,7 @@ def verify(
     day: str,
     retrieved: dict[str, Chunk],
     notes_rule: bool = True,
+    lang: str = "en",
 ) -> list[str]:
     """Why the cited passages do not support this answer; empty when they do."""
     if draft.refused:
@@ -54,7 +55,7 @@ def verify(
     errors: list[str] = []
     if not draft.claims:
         errors.append("an answer that is not a refusal needs at least one claim")
-    asked = numbers(question)
+    asked = numbers(question, lang)
     claimed: set[Number] = set()
     for n, claim in enumerate(draft.claims, 1):
         if not claim.chunk_ids:
@@ -72,13 +73,13 @@ def verify(
                 f"claim {n} cites untrusted notes, which are never a source: {', '.join(notes)}"
             )
         sources = SOURCE_TIERS if notes_rule else (*SOURCE_TIERS, "T3")
-        support = set().union(*(numbers(c.body) for c in cited if c.tier in sources))
-        found = numbers(claim.text)
+        support = set().union(*(numbers(c.body, lang) for c in cited if c.tier in sources))
+        found = numbers(claim.text, lang)
         claimed |= found
         unsupported = found - asked - support
         if unsupported:
             errors.append(f"claim {n} states {show(unsupported)}, which no cited passage contains")
-    loose = numbers(draft.answer) - asked - claimed
+    loose = numbers(draft.answer, lang) - asked - claimed
     if loose:
         errors.append(f"the answer states {show(loose)}, which no claim states")
     return errors

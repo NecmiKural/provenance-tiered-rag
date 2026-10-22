@@ -17,6 +17,7 @@ from pydantic import ValidationError
 
 from provrag.ingest import Chunk
 from provrag.llm import LLM, cost_usd, usage_of
+from provrag.numbers import LANGUAGES
 from provrag.verify import Draft, verify
 
 PROMPT = files("provrag").joinpath("prompts/answer.md").read_text()
@@ -33,6 +34,8 @@ PLAIN_PROMPT = files("provrag").joinpath("prompts/answer_plain.md").read_text()
 PROMPT_CANARY = "PROMPT-CANARY-K7Q2"
 JSON = {"type": "json_object"}
 TIER_NAMES = {"T1": "statute", "T2": "guidance"}
+# The prompt with its rules and the plain prompt, per jurisdiction.
+PROMPTS = {"NZ": (PROMPT, PLAIN_PROMPT)}
 
 
 @dataclass(frozen=True)
@@ -141,10 +144,13 @@ def answer(
     chunks: list[Chunk],
     llm: LLM,
     defences: Defences = DEFENCES["on"],
+    jurisdiction: str = "NZ",
 ) -> Outcome:
     retrieved = {c.id: c for c in chunks}
+    ruled, plain = PROMPTS[jurisdiction]
+    lang = LANGUAGES[jurisdiction]
     messages = [
-        {"role": "system", "content": PROMPT if defences.prompt_rules else PLAIN_PROMPT},
+        {"role": "system", "content": ruled if defences.prompt_rules else plain},
         {"role": "user", "content": user_message(question, day, chunks, defences)},
     ]
     outcome = Outcome()
@@ -159,7 +165,9 @@ def answer(
         content = reply.response.choices[0].message.content or ""
         draft, errors = parse(content)
         if draft is not None and defences.verifier:
-            errors = verify(draft, question, day, retrieved, notes_rule=defences.notes_rule)
+            errors = verify(
+                draft, question, day, retrieved, notes_rule=defences.notes_rule, lang=lang
+            )
         outcome.attempts.append(Attempt(content, draft, errors))
         if draft is not None and (not errors or not defences.verifier):
             outcome.answer = draft

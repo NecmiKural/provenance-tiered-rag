@@ -21,12 +21,18 @@ def read(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text(encoding="ascii").splitlines()]
 
 
-def questions(held_back: bool = False, root: Path = ROOT) -> list[dict]:
-    return read(root / ("questions-held-back.jsonl" if held_back else "questions.jsonl"))
+def folder(jurisdiction: str = "NZ") -> Path:
+    """New Zealand's eval set sits at the top of evals/, others in a folder of their own."""
+    return ROOT if jurisdiction == "NZ" else ROOT / jurisdiction.lower()
 
 
-def payloads(root: Path = ROOT) -> list[dict]:
-    return read(root / "payloads.jsonl")
+def questions(held_back: bool = False, jurisdiction: str = "NZ") -> list[dict]:
+    name = "questions-held-back.jsonl" if held_back else "questions.jsonl"
+    return [{**q, "jurisdiction": jurisdiction} for q in read(folder(jurisdiction) / name)]
+
+
+def payloads(jurisdiction: str = "NZ") -> list[dict]:
+    return read(folder(jurisdiction) / "payloads.jsonl")
 
 
 def locator(chunk: Chunk) -> str:
