@@ -301,7 +301,7 @@ SECTIONS = {
     "nz-immigration": (
         "New Zealand immigration: the Operational Manual",
         "Questions on the Skilled Migrant Category, Green List, Accredited Employer and"
-        " Post-Study work instructions, as they stand and as they stood on past dates,",
+        " Post-Study work instructions, as they stand and as they stood on past dates",
         "questions the sources do not cover, including dates before the archive,",
         "Retrieval on the immigration questions, as above. The index holds every archived"
         " version of each instruction, so the run without the date filter shows what the"

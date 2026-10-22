@@ -15,7 +15,7 @@ def test_readme_results_are_in_sync():
     )
 
 
-@pytest.mark.parametrize("pack", ["nz-gst", "de-vat"])
+@pytest.mark.parametrize("pack", ["nz-gst", "de-vat", "nz-immigration"])
 def test_attacks_succeed_somewhere_with_every_defence_off(pack):
     """An attack set that never succeeds, even undefended, would prove nothing."""
     off = report.evals(ROOT / "results", pack).get("off")

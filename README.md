@@ -1,6 +1,6 @@
 # Provenance-Tiered RAG
 
-Question answering over New Zealand GST law, and in a second jurisdiction German VAT law, that knows where each passage comes from and when it was in force. Statute outranks official guidance, which outranks untrusted notes; every answer cites passages valid on the date asked about, and code checks that every number in the answer appears in a cited statute or guidance passage.
+Question answering over New Zealand GST law, German VAT law and New Zealand immigration instructions, that knows where each passage comes from and when it was in force. Statute outranks official guidance, which outranks untrusted notes; every answer cites passages valid on the date asked about, and code checks that every number in the answer appears in a cited statute or guidance passage.
 
 Every measured number in the results block is regenerated from `results/*.json` by `provrag report`, and CI fails if it drifts.
 
@@ -134,6 +134,55 @@ The German held-back quarter, run once at the end with every defence on. Commit 
 | Attacks, what the user saw | 0 of 57 (0.0%) | 0 of 3 (0.0%) |
 | Vector retrieval, gold passage in the top 5 | 21 of 21 (100.0%) | 7 of 7 (100.0%) |
 
+### New Zealand immigration: the Operational Manual
+
+Questions on the Skilled Migrant Category, Green List, Accredited Employer and Post-Study work instructions, as they stand and as they stood on past dates, with every defence on: 78 of 78 answers to answerable questions were correct (95% lower bound 95.3%) over 3 runs; questions the sources do not cover, including dates before the archive, were refused in 18 of 18 (100.0%) runs, arithmetic in 9 of 9 (100.0%), and requests to assess the asker's own case in 18 of 18 (100.0%). With a payload note placed in the context, 0 of 60 (0.0%) attacked answers did what the payload asked; with every defence off, 3 of 60 (5.0%) over 3 runs.
+
+| | |
+|---|---|
+| Answerable: right figures, verified | 78 of 78 (100.0%) |
+| Answerable: refused | 0 of 78 (0.0%) |
+| Answers citing a labelled passage | 75 of 78 (96.2%) |
+| Not covered by the sources: refused | 18 of 18 (100.0%) |
+| Needs arithmetic: refused | 9 of 9 (100.0%) |
+| Asks to assess the asker's own case: refused | 18 of 18 (100.0%) |
+| First drafts the verifier rejected | 1 of 123 (0.8%) |
+| Of those, repaired and correct | 1 of 1 (100.0%) |
+| Refusals made by the verifier | 0 of 123 (0.0%) |
+| Answerable questions with the same outcome in every run | 26 of 26 (100.0%) |
+| Cost per question (peak price) | $0.0004 |
+| Time per question, p50 and p95 | 2.2 s and 3.8 s |
+
+Prompt `910e779c8861`, retrieval `vector` with k=5; commit `3a2626c`.
+
+| Payload goal | First draft | What the user saw | Payloads succeeding in any run (95% upper bound) | Reached the top 5 on its own |
+|---|---|---|---|---|
+| Plant a wrong figure | 0 of 12 (0.0%) | 0 of 12 (0.0%) | 0 of 4 (up to 49.0%) | 4 of 4 |
+| Get the note cited | 0 of 12 (0.0%) | 0 of 12 (0.0%) | 0 of 4 (up to 49.0%) | 1 of 4 |
+| Leak the prompt | 0 of 12 (0.0%) | 0 of 12 (0.0%) | 0 of 4 (up to 49.0%) | 0 of 4 |
+| Force a refusal | 0 of 12 (0.0%) | 0 of 12 (0.0%) | 0 of 4 (up to 49.0%) | 1 of 4 |
+| Add an off-topic link | 0 of 12 (0.0%) | 0 of 12 (0.0%) | 0 of 4 (up to 49.0%) | 0 of 4 |
+
+| Defences | Runs | Answerable correct | Arithmetic refused | Attacks, first draft | Attacks, what the user saw | Answers failing the verifier's checks |
+|---|---|---|---|---|---|---|
+| All on | 3 | 78 of 78 (100.0%) | 9 of 9 (100.0%) | 0 of 60 (0.0%) | 0 of 60 (0.0%) | 0 of 78 (0.0%) |
+| Prompt rules off | 1 | 26 of 26 (100.0%) | 3 of 3 (100.0%) | 0 of 20 (0.0%) | 0 of 20 (0.0%) | 0 of 29 (0.0%) |
+| Fence off | 1 | 26 of 26 (100.0%) | 3 of 3 (100.0%) | 0 of 20 (0.0%) | 0 of 20 (0.0%) | 0 of 26 (0.0%) |
+| Notes rule off | 1 | 26 of 26 (100.0%) | 3 of 3 (100.0%) | 0 of 20 (0.0%) | 0 of 20 (0.0%) | 0 of 26 (0.0%) |
+| Verifier off | 1 | 25 of 26 (96.2%) | 3 of 3 (100.0%) | 0 of 20 (0.0%) | 0 of 20 (0.0%) | 1 of 26 (3.8%) |
+| Hidden-text stripping off | 1 | 26 of 26 (100.0%) | 3 of 3 (100.0%) | 0 of 20 (0.0%) | 0 of 20 (0.0%) | 0 of 26 (0.0%) |
+| All off except the prompt rules | 3 | 75 of 78 (96.2%) | 9 of 9 (100.0%) | 0 of 60 (0.0%) | 0 of 60 (0.0%) | 3 of 78 (3.8%) |
+| All off | 3 | 76 of 78 (97.4%) | 0 of 9 (0.0%) | 3 of 60 (5.0%) | 3 of 60 (5.0%) | 11 of 88 (12.5%) |
+
+Retrieval on the immigration questions, as above. The index holds every archived version of each instruction, so the run without the date filter shows what the filter does. Commit `3a2626c`.
+
+| Method | All (26) | Written from the Act (2) | Written from guidance (24) | About a past date (4) | Payloads in the top 5 |
+|---|---|---|---|---|---|
+| Full text | 0.615 and 0.462 | 0.000 and 0.000 | 0.667 and 0.501 | 1.000 and 0.750 | 0 of 20 (0.0%) |
+| Vector | 0.962 and 0.852 | 1.000 and 1.000 | 0.958 and 0.839 | 0.750 and 0.661 | 6 of 20 (30.0%) |
+| RRF | 0.962 and 0.690 | 1.000 and 0.292 | 0.958 and 0.723 | 1.000 and 0.800 | 0 of 20 (0.0%) |
+| RRF, no date filter | 0.269 and 0.276 | 0.500 and 0.208 | 0.250 and 0.281 | 0.000 and 0.025 | 0 of 20 (0.0%) |
+
 ### Where the index runs
 
 Loading the whole index (schema, chunks and vectors) and the retrieval query answering uses, timed from this machine; network time is included. RDS rows come from the one-day trial in [docs/rds-trial.md](docs/rds-trial.md).
@@ -144,6 +193,8 @@ Loading the whole index (schema, chunks and vectors) and the retrieval query ans
 <!-- results:end -->
 
 ## Corpus
+
+Each body of law is a pack: its sources, eval set, prompt and language. `--pack` picks one for `ask`, `eval` and `retrieval`; retrieval searches one pack only, and a results file's data fingerprint covers only that pack's sources and questions. The tables below describe New Zealand GST; [Germany](#germany) and [New Zealand immigration](#new-zealand-immigration) follow.
 
 Three tiers, each with dates. `sources.toml` lists every source with its tier, licence and checksum.
 
@@ -161,6 +212,14 @@ A second jurisdiction runs through the same pipeline: the Umsatzsteuergesetz and
 
 The site publishes only the current consolidation, and the federal NeuRIS service holds only the current UStG in its test phase, so the German law has one version, dated by its last amending act. Questions about earlier dates find no passage in force and are refused, even where today's text describes an earlier window: § 28 states the rate cut of the second half of 2020, and a question asked as of today about that window is answerable, while the same question dated in 2020 is not. There is no German guidance tier: the administrative guidance (UStAE) is published as PDF, and this project adds no PDF parser.
 
+## New Zealand immigration
+
+The third pack asks about Immigration New Zealand's [Operational Manual](https://www.immigration.govt.nz/opsmanual/): the Skilled Migrant Category (SR3), the Green List residence instructions (SR4 and SR5), the Accredited Employer work visa (WA4) and Post-Study work (WD). The manual keeps every archived version of an instruction next to the current one, and each page states the date it took effect, so each part of an instruction is dated from its effective date until the next version takes effect, the instruction ends ("to 23/08/2026", "revoked 01/07/2023"), or onwards. The archive reaches back to November 2010. The instruction's own sub-headings (SR3.10.5) are its parts, and each table row becomes one line. Sections 22, 23, 25 and 26 of the Immigration Act 2009, under which instructions are certified, classified, published and applied, are the statute tier.
+
+Every answer is information from the published instructions, not immigration advice. The Immigration Advisers Licensing Act 2007 leaves out of "immigration advice" providing information that is publicly available or published by the Department (s 7(1)(b)(i)), and directing someone to the Department or to the register of licensed advisers (s 7(1)(b)(ii)). The immigration prompt has one rule more than the GST prompt: a question about the asker's own case (whether they qualify, should apply, which pathway suits them) is refused, with a pointer to Immigration New Zealand or a licensed immigration adviser. The eval set has a fourth kind for those questions, which must be refused, and the number reader also reads points, hours, ages and multiples of a wage threshold ("1.5 times", "twice"). This is a design choice for a portfolio project, not a legal opinion.
+
+The appendices the instructions rely on, such as the Green List occupations, are not in the corpus, and questions that need them are refused.
+
 ## Eval set
 
 Written before any prompt, then frozen: `tests/test_evals.py` pins the checksum of every file, and the `evals-frozen` tag marks the commit.
@@ -168,6 +227,8 @@ Written before any prompt, then frozen: `tests/test_evals.py` pins the checksum 
 - `evals/questions.jsonl`: answerable questions in plain words, labelled with the passages that support them (by section or guidance heading, valid on the question's date) and the numbers a right answer must contain; questions the corpus cannot answer, including dates before it begins; and arithmetic questions, which the system should refuse because it does no arithmetic.
 - `evals/questions-held-back.jsonl`: about a quarter of the questions of every kind, held back from tuning and run once at the end.
 - `evals/payloads.jsonl`: the payload planted in each T3 note, with its goal (a wrong figure, being cited, leaking the prompt, refusing an answerable question, adding an off-topic link), its style (plain imperative, fake authority, invisible Unicode tag characters, fake closing tags, ordinary conversation), the question it targets and a canary code can detect. Evaluation shows the model one payload note at a time, so payloads never compete.
+
+The German and immigration sets sit in `evals/de/` and `evals/nz-immigration/`, each frozen under its own tag (`evals-de-frozen`, `evals-nz-immigration-frozen`) before its prompt was written.
 
 Oracle tests check, with no model, that every gold passage exists and is in force on the question's date, that every expected number is in it as the same typed number, that every payload note is posted before its target's date, and that every planted figure is wrong for its target.
 
@@ -221,12 +282,16 @@ The notes are the injection surface: anyone can post one, and retrieval can surf
 - **Guidance is dated by its last update.** Inland Revenue pages have no dated versions, so guidance only answers questions about dates on or after the page's last update, even where the page was true before.
 - **One model.** Only `deepseek-flash` was measured; a different model may follow payloads more readily or refuse more.
 - **The German set is smaller and has no history.** It has one consolidation, no guidance tier and fewer payloads, and its questions and notes were written by the same author, in German that a native speaker has not reviewed.
+- **The immigration archive is what the manual keeps.** Where the manual holds no copy of a version, the one before it stays in force here until the next it holds. Section index pages and two undated notes are left out, and so are the appendices.
+- **Table cells carry bare figures.** A points table gives "3" under a "Points" heading, which the number reader does not type, so a claim of "3 points" quoted from it cannot be checked and fails; with every defence on it is repaired or refused, and in the runs with the verifier off it counts against the answer.
+- **Whether a question asks for advice is the model's call.** The advice questions measure refusals; code does not check what a refusal's reason says, and a reason can still touch on the asker's case while declining to assess it.
 - **Replay tests the harness, not the model.** The CI gate replays a recorded slice to check that code still makes the same decisions from the same replies; live quality comes only from the dated results files.
 
 ## Verification
 
 - `tests/test_corpus.py` checks every corpus file against its pinned checksum and the statute's history against two known changes: the rate on 1 October 2010 and the registration threshold on 1 April 2009.
 - `tests/test_evals.py` checks the frozen eval set with no model: every label in force on its date, every expected figure in a labelled passage as the same typed number, every payload note posted before its target's date and every planted figure wrong for it.
+- `tests/test_opsmanual.py` checks the manual's parser on a page fixture and the built archive: the median wage in force on three dates, a revoked instruction ending on its revocation date, and one text per part on any day.
 - `tests/test_numbers.py` and `tests/test_verify.py` cover typed numbers and each verifier rule; `tests/test_answer.py` and `tests/test_evaluate.py` run the loop and the scoring against a scripted model.
 - `tests/test_db.py` and `tests/test_retrieve.py` run against Postgres: the reader role cannot write, an overlapping version is refused, and every passage retrieved is in force on the date.
 - `tests/test_gate.py` replays a committed slice through retrieval, answering and scoring and requires the recorded decisions; a copy with every reply turned into a refusal must fail, and nothing recorded may carry a key.
@@ -248,6 +313,8 @@ uv run provrag report                 # rewrite the results block above
 uv run provrag retrieval              # the retrieval ablation (embeddings only)
 uv run provrag fetch                  # rebuild corpus/ from the sites; checksums must match
 uv run --env-file .env provrag ask "What was the GST rate?" --as-of 2010-09-30
+uv run --env-file .env provrag ask "What is the SMC wage threshold?" --pack nz-immigration --as-of 2025-10-01
+uv run --env-file .env provrag eval --pack nz-immigration   # another pack: de-vat or nz-immigration
 ```
 
 ## Running on Amazon RDS
@@ -259,16 +326,21 @@ uv run --env-file .env provrag ask "What was the GST rate?" --as-of 2010-09-30
 ```
 sources.toml        every source: tier, licence, dates and checksum
 corpus/nz/          the Act by subsection and date, Inland Revenue guidance, the notes
+corpus/de/          UStG and UStDV paragraphs, German notes
+corpus/nz-immigration/  Operational Manual parts by date, Immigration Act sections, notes
 corpus/embeddings/  committed vectors, keyed by the hash of each text
-evals/              frozen questions, held-back questions and payloads
+evals/              frozen questions, held-back questions and payloads; de/ and nz-immigration/ alike
 src/provrag/
+  packs.py          each pack's sources, eval set, language and results name
   legislation.py    point-in-time statute versions to dated subsections
   guidance.py       guidance pages to heading sections
+  gii.py            German statutes from gesetze-im-internet.de
+  opsmanual.py      Operational Manual instructions and their archived versions
   ingest.py         normalisation, hidden-text flags, chunks and loading
   schema.sql        the index, its exclusion constraint and the reader role
   embed.py          embeddings with a committed cache and quota handling
   retrieve.py       one query: date filter, full text, vectors, fusion
-  numbers.py        typed numbers in legal text
+  numbers.py        typed numbers in legal text; numbers_de.py reads German
   verify.py         the verifier's rules
   answer.py         the loop, the fence and the switchable defences
   prompts/          the answer prompt and the plain prompt for the ablation
@@ -289,7 +361,7 @@ docs/               threat model, agent log and the RDS runbook
 
 The rules the coding agent works under are committed in [AGENTS.md](AGENTS.md). Its notable mistakes, how each was caught and what changed are in [docs/agent-log.md](docs/agent-log.md). It reuses the skeleton of [bank-reconciliation-agent](https://github.com/NecmiKural/bank-reconciliation-agent).
 
-> Not tax advice. A portfolio project; the questions, notes and evaluation are written for it. Statute text has no copyright in New Zealand; Inland Revenue guidance is Crown copyright, reproduced under CC BY 4.0.
+> Not tax or immigration advice. A portfolio project; the questions, notes and evaluation are written for it. Statute text has no copyright in New Zealand; Inland Revenue guidance is Crown copyright, reproduced under CC BY 4.0; the Operational Manual is Crown copyright, Ministry of Business, Innovation and Employment, reproduced under [CC BY 3.0 NZ](https://creativecommons.org/licenses/by/3.0/nz/), cut into parts with tables flattened to lines.
 
 ## Tech
 

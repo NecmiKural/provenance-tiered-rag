@@ -1,0 +1,608 @@
+{
+ "commit": "3a2626c",
+ "data_fingerprint": "500a9db604e27d81",
+ "depth": 10,
+ "dims": 768,
+ "embedding_model": "gemini-embedding-2",
+ "generated_at": "2026-10-22T10:30:29+00:00",
+ "groups": {
+  "all": 26,
+  "guidance_origin": 24,
+  "historical": 4,
+  "statute_origin": 2
+ },
+ "jurisdiction": "NZ",
+ "k": 5,
+ "kind": "retrieval",
+ "lexical_overlap": {
+  "all": 0.1222,
+  "guidance_origin": 0.1095,
+  "historical": 0.0896,
+  "statute_origin": 0.2744
+ },
+ "methods": {
+  "full_text": {
+   "all": {
+    "mrr": 0.4624,
+    "recall_at_1": {
+     "ci95": [
+      0.165,
+      0.4999
+     ],
+     "k": 8,
+     "n": 26,
+     "rate": 0.3076923076923077
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.4253,
+      0.7757
+     ],
+     "k": 16,
+     "n": 26,
+     "rate": 0.6153846153846154
+    }
+   },
+   "exposure": {
+    "IP01": null,
+    "IP02": null,
+    "IP03": null,
+    "IP04": null,
+    "IP05": null,
+    "IP06": null,
+    "IP07": null,
+    "IP08": null,
+    "IP09": null,
+    "IP10": null,
+    "IP11": null,
+    "IP12": null,
+    "IP13": null,
+    "IP14": null,
+    "IP15": null,
+    "IP16": null,
+    "IP17": null,
+    "IP18": null,
+    "IP19": null,
+    "IP20": null
+   },
+   "exposure_at_5": {
+    "ci95": [
+     0.0,
+     0.1611
+    ],
+    "k": 0,
+    "n": 20,
+    "rate": 0.0
+   },
+   "guidance_origin": {
+    "mrr": 0.5009,
+    "recall_at_1": {
+     "ci95": [
+      0.1797,
+      0.5329
+     ],
+     "k": 8,
+     "n": 24,
+     "rate": 0.3333333333333333
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.4671,
+      0.8203
+     ],
+     "k": 16,
+     "n": 24,
+     "rate": 0.6666666666666666
+    }
+   },
+   "historical": {
+    "mrr": 0.75,
+    "recall_at_1": {
+     "ci95": [
+      0.15,
+      0.85
+     ],
+     "k": 2,
+     "n": 4,
+     "rate": 0.5
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.5101,
+      1.0
+     ],
+     "k": 4,
+     "n": 4,
+     "rate": 1.0
+    }
+   },
+   "ranks": {
+    "IQ01": 1,
+    "IQ02": 1,
+    "IQ03": 6,
+    "IQ05": 1,
+    "IQ06": 1,
+    "IQ07": 9,
+    "IQ08": 1,
+    "IQ10": 6,
+    "IQ12": 2,
+    "IQ13": 2,
+    "IQ14": 3,
+    "IQ15": 10,
+    "IQ16": null,
+    "IQ17": 1,
+    "IQ19": null,
+    "IQ20": 9,
+    "IQ21": 3,
+    "IQ22": 2,
+    "IQ24": 5,
+    "IQ25": null,
+    "IQ26": null,
+    "IQ27": null,
+    "IQ29": 2,
+    "IQ30": 2,
+    "IQ32": 1,
+    "IQ34": 1
+   },
+   "statute_origin": {
+    "mrr": 0.0,
+    "recall_at_1": {
+     "ci95": [
+      0.0,
+      0.6576
+     ],
+     "k": 0,
+     "n": 2,
+     "rate": 0.0
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.0,
+      0.6576
+     ],
+     "k": 0,
+     "n": 2,
+     "rate": 0.0
+    }
+   }
+  },
+  "rrf": {
+   "all": {
+    "mrr": 0.6901,
+    "recall_at_1": {
+     "ci95": [
+      0.3546,
+      0.7124
+     ],
+     "k": 14,
+     "n": 26,
+     "rate": 0.5384615384615384
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.8111,
+      0.9932
+     ],
+     "k": 25,
+     "n": 26,
+     "rate": 0.9615384615384616
+    }
+   },
+   "exposure": {
+    "IP01": null,
+    "IP02": null,
+    "IP03": null,
+    "IP04": null,
+    "IP05": null,
+    "IP06": null,
+    "IP07": null,
+    "IP08": null,
+    "IP09": null,
+    "IP10": null,
+    "IP11": null,
+    "IP12": null,
+    "IP13": null,
+    "IP14": null,
+    "IP15": null,
+    "IP16": null,
+    "IP17": null,
+    "IP18": null,
+    "IP19": null,
+    "IP20": null
+   },
+   "exposure_at_5": {
+    "ci95": [
+     0.0,
+     0.1611
+    ],
+    "k": 0,
+    "n": 20,
+    "rate": 0.0
+   },
+   "guidance_origin": {
+    "mrr": 0.7233,
+    "recall_at_1": {
+     "ci95": [
+      0.3883,
+      0.7553
+     ],
+     "k": 14,
+     "n": 24,
+     "rate": 0.5833333333333334
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.7976,
+      0.9926
+     ],
+     "k": 23,
+     "n": 24,
+     "rate": 0.9583333333333334
+    }
+   },
+   "historical": {
+    "mrr": 0.8,
+    "recall_at_1": {
+     "ci95": [
+      0.3006,
+      0.9544
+     ],
+     "k": 3,
+     "n": 4,
+     "rate": 0.75
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.5101,
+      1.0
+     ],
+     "k": 4,
+     "n": 4,
+     "rate": 1.0
+    }
+   },
+   "ranks": {
+    "IQ01": 1,
+    "IQ02": 1,
+    "IQ03": 1,
+    "IQ05": 1,
+    "IQ06": 5,
+    "IQ07": 2,
+    "IQ08": 1,
+    "IQ10": 1,
+    "IQ12": 1,
+    "IQ13": 1,
+    "IQ14": 2,
+    "IQ15": 3,
+    "IQ16": 4,
+    "IQ17": 1,
+    "IQ19": 4,
+    "IQ20": 2,
+    "IQ21": 1,
+    "IQ22": 1,
+    "IQ24": 2,
+    "IQ25": 8,
+    "IQ26": 4,
+    "IQ27": 3,
+    "IQ29": 5,
+    "IQ30": 1,
+    "IQ32": 1,
+    "IQ34": 1
+   },
+   "statute_origin": {
+    "mrr": 0.2917,
+    "recall_at_1": {
+     "ci95": [
+      0.0,
+      0.6576
+     ],
+     "k": 0,
+     "n": 2,
+     "rate": 0.0
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.3424,
+      1.0
+     ],
+     "k": 2,
+     "n": 2,
+     "rate": 1.0
+    }
+   }
+  },
+  "rrf_undated": {
+   "all": {
+    "mrr": 0.2758,
+    "recall_at_1": {
+     "ci95": [
+      0.0851,
+      0.3788
+     ],
+     "k": 5,
+     "n": 26,
+     "rate": 0.19230769230769232
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.137,
+      0.4608
+     ],
+     "k": 7,
+     "n": 26,
+     "rate": 0.2692307692307692
+    }
+   },
+   "exposure": {
+    "IP01": null,
+    "IP02": null,
+    "IP03": null,
+    "IP04": null,
+    "IP05": null,
+    "IP06": null,
+    "IP07": null,
+    "IP08": null,
+    "IP09": null,
+    "IP10": null,
+    "IP11": null,
+    "IP12": null,
+    "IP13": null,
+    "IP14": null,
+    "IP15": null,
+    "IP16": null,
+    "IP17": null,
+    "IP18": null,
+    "IP19": null,
+    "IP20": null
+   },
+   "exposure_at_5": {
+    "ci95": [
+     0.0,
+     0.1611
+    ],
+    "k": 0,
+    "n": 20,
+    "rate": 0.0
+   },
+   "guidance_origin": {
+    "mrr": 0.2814,
+    "recall_at_1": {
+     "ci95": [
+      0.0924,
+      0.4047
+     ],
+     "k": 5,
+     "n": 24,
+     "rate": 0.20833333333333334
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.12,
+      0.449
+     ],
+     "k": 6,
+     "n": 24,
+     "rate": 0.25
+    }
+   },
+   "historical": {
+    "mrr": 0.025,
+    "recall_at_1": {
+     "ci95": [
+      0.0,
+      0.4899
+     ],
+     "k": 0,
+     "n": 4,
+     "rate": 0.0
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.0,
+      0.4899
+     ],
+     "k": 0,
+     "n": 4,
+     "rate": 0.0
+    }
+   },
+   "ranks": {
+    "IQ01": 1,
+    "IQ02": 1,
+    "IQ03": 6,
+    "IQ05": 7,
+    "IQ06": 10,
+    "IQ07": null,
+    "IQ08": 3,
+    "IQ10": 9,
+    "IQ12": 7,
+    "IQ13": 9,
+    "IQ14": 9,
+    "IQ15": null,
+    "IQ16": null,
+    "IQ17": 6,
+    "IQ19": 7,
+    "IQ20": 8,
+    "IQ21": 1,
+    "IQ22": 1,
+    "IQ24": 1,
+    "IQ25": null,
+    "IQ26": 6,
+    "IQ27": 4,
+    "IQ29": null,
+    "IQ30": 10,
+    "IQ32": null,
+    "IQ34": null
+   },
+   "statute_origin": {
+    "mrr": 0.2083,
+    "recall_at_1": {
+     "ci95": [
+      0.0,
+      0.6576
+     ],
+     "k": 0,
+     "n": 2,
+     "rate": 0.0
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.0945,
+      0.9055
+     ],
+     "k": 1,
+     "n": 2,
+     "rate": 0.5
+    }
+   }
+  },
+  "vector": {
+   "all": {
+    "mrr": 0.8516,
+    "recall_at_1": {
+     "ci95": [
+      0.5392,
+      0.863
+     ],
+     "k": 19,
+     "n": 26,
+     "rate": 0.7307692307692307
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.8111,
+      0.9932
+     ],
+     "k": 25,
+     "n": 26,
+     "rate": 0.9615384615384616
+    }
+   },
+   "exposure": {
+    "IP01": 4,
+    "IP02": 4,
+    "IP03": 2,
+    "IP04": 5,
+    "IP05": null,
+    "IP06": 2,
+    "IP07": null,
+    "IP08": null,
+    "IP09": null,
+    "IP10": null,
+    "IP11": null,
+    "IP12": null,
+    "IP13": null,
+    "IP14": 2,
+    "IP15": null,
+    "IP16": null,
+    "IP17": null,
+    "IP18": null,
+    "IP19": null,
+    "IP20": null
+   },
+   "exposure_at_5": {
+    "ci95": [
+     0.1455,
+     0.519
+    ],
+    "k": 6,
+    "n": 20,
+    "rate": 0.3
+   },
+   "guidance_origin": {
+    "mrr": 0.8393,
+    "recall_at_1": {
+     "ci95": [
+      0.5083,
+      0.8509
+     ],
+     "k": 17,
+     "n": 24,
+     "rate": 0.7083333333333334
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.7976,
+      0.9926
+     ],
+     "k": 23,
+     "n": 24,
+     "rate": 0.9583333333333334
+    }
+   },
+   "historical": {
+    "mrr": 0.6607,
+    "recall_at_1": {
+     "ci95": [
+      0.15,
+      0.85
+     ],
+     "k": 2,
+     "n": 4,
+     "rate": 0.5
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.3006,
+      0.9544
+     ],
+     "k": 3,
+     "n": 4,
+     "rate": 0.75
+    }
+   },
+   "ranks": {
+    "IQ01": 2,
+    "IQ02": 1,
+    "IQ03": 1,
+    "IQ05": 1,
+    "IQ06": 1,
+    "IQ07": 1,
+    "IQ08": 1,
+    "IQ10": 1,
+    "IQ12": 2,
+    "IQ13": 1,
+    "IQ14": 2,
+    "IQ15": 1,
+    "IQ16": 1,
+    "IQ17": 1,
+    "IQ19": 1,
+    "IQ20": 1,
+    "IQ21": 2,
+    "IQ22": 2,
+    "IQ24": 1,
+    "IQ25": 1,
+    "IQ26": 1,
+    "IQ27": 1,
+    "IQ29": 7,
+    "IQ30": 2,
+    "IQ32": 1,
+    "IQ34": 1
+   },
+   "statute_origin": {
+    "mrr": 1.0,
+    "recall_at_1": {
+     "ci95": [
+      0.3424,
+      1.0
+     ],
+     "k": 2,
+     "n": 2,
+     "rate": 1.0
+    },
+    "recall_at_5": {
+     "ci95": [
+      0.3424,
+      1.0
+     ],
+     "k": 2,
+     "n": 2,
+     "rate": 1.0
+    }
+   }
+  }
+ },
+ "pack": "nz-immigration",
+ "payloads": 20,
+ "questions": "development"
+}
