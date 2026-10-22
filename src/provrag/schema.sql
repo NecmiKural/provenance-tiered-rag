@@ -26,7 +26,10 @@ CREATE TABLE corpus.chunk (
     body         text NOT NULL,
     valid        daterange NOT NULL CHECK (NOT isempty(valid)),
     hidden_text  boolean NOT NULL,
-    search       tsvector GENERATED ALWAYS AS (to_tsvector('english', heading || ' ' || body)) STORED,
+    -- Stemmed in the language of the jurisdiction's law.
+    search       tsvector GENERATED ALWAYS AS (to_tsvector(
+                     CASE jurisdiction WHEN 'DE' THEN 'german'::regconfig ELSE 'english'::regconfig END,
+                     heading || ' ' || body)) STORED,
     embedding    vector(768) NOT NULL,
     -- One text per provision on any day: overlapping versions are refused here, not in code.
     EXCLUDE USING gist (source WITH =, section_key WITH =, part WITH =, valid WITH &&)

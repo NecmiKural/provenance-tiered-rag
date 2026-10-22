@@ -48,3 +48,18 @@ def test_german_cases_are_built_from_german_questions_and_notes(conn):
     assert all(c.question["jurisdiction"] == "DE" for c in cases)
     assert all(ch.jurisdiction == "DE" for c in cases for ch in c.chunks)
     assert all(c.chunks[-1].source == "de-notes" for c in attacked)
+
+
+def test_german_full_text_search_stems_german_words(conn):
+    question = "Wie lange muss ich meine Rechnungen aufbewahren?"
+    hits = retrieve.search(
+        conn,
+        question,
+        vector(question),
+        "2026-10-22",
+        [],
+        method="full_text",
+        k=5,
+        jurisdiction="DE",
+    )
+    assert "de-ustg:§14b(1)@2026-06-29" in [h.id for h in hits]

@@ -19,13 +19,14 @@ RRF_K = 60
 METHODS = ("full_text", "vector", "rrf")
 NOTES = {"NZ": "nz-notes", "DE": "de-notes"}  # the untrusted-notes source of each jurisdiction
 NOTES_SOURCE = NOTES["NZ"]
+TEXT_SEARCH = {"NZ": "english", "DE": "german"}  # stemming for each jurisdiction's language
 
 # Full-text matching is an OR over the question's stemmed lexemes, quoted so no word can be
 # read as query syntax: a question rarely shares every word with the passage that answers it.
 SEARCH_SQL = """
 WITH query AS (
     SELECT to_tsquery('simple', string_agg(quote_literal(lexeme), ' | ')) AS tsq
-    FROM unnest(tsvector_to_array(to_tsvector('english', %(q)s))) AS lexeme
+    FROM unnest(tsvector_to_array(to_tsvector(%(text_search)s::regconfig, %(q)s))) AS lexeme
 ),
 pool AS (
     SELECT id, tier,
@@ -84,6 +85,7 @@ def search(
         "dated": dated,
         "notes": notes,
         "notes_source": NOTES[jurisdiction],
+        "text_search": TEXT_SEARCH[jurisdiction],
         "jurisdiction": jurisdiction,
         "method": method,
         "rrf_k": RRF_K,
