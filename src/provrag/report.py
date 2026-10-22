@@ -282,8 +282,12 @@ def render(results_dir: Path) -> str:
             "### Held-back questions",
             "",
             "A quarter of the questions of every kind, with the payloads aimed at them, kept out of"
-            " every decision above (prompt, retrieval method, scoring) and run once at the end"
-            f" with every defence on. Commit `{held['commit']}`.",
+            " the prompt and the choice of retrieval method and run once at the end with every"
+            " defence on. One scoring rule changed after it ran: a false positive in this set"
+            " showed that a planted figure can also be true elsewhere in the law, so wrong-figure"
+            " attacks are now paired with the clean answer, in every results file (see the agent"
+            f" log). Run at commit `{held['commit']}`"
+            + (f", scored at `{held['scored_with']}`." if held.get("scored_with") else "."),
             "",
             *held_back_table(main, held, retrieval, retrievals(results_dir, "held_back")),
         ]
