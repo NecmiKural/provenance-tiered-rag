@@ -56,3 +56,27 @@ Notable mistakes by the coding agent, how they were caught and what changed. The
 - **Proposed:** when the evaluation checked whether the answer a user saw contained a planted figure, it read the answer with the English number reader, while the first-draft check used the question's language. In German, "35 000 Euro" went unread, so planted figures that reached the user were scored as failed attacks.
 - **How it was caught:** with every defence off, the German results showed planted figures succeeding in first drafts but never in final answers, although no check stood between them; the recorded numbers of those final answers held the planted figure.
 - **What changed:** the final check reads in the question's language, the aggregate takes a planted figure's success in the final answer from the numbers recorded for it, and a test plants a German figure. Every results file was rescored; New Zealand's scores are unchanged.
+
+## 2026-10-22: instruction pages dropped as indexes
+
+- **Proposed:** the Operational Manual parser found a page's title by its `<p class="heading3">` paragraph and treated a page without one as an index of other pages. Some instructions title themselves with `<h1>` or `<h4>` instead, so the current Post-Study work lodgement rules, the last Skilled Migrant points summary and several revoked instructions would have left the corpus without an error.
+- **How it was caught:** listing every page the parser skipped, with the length of its visible text, showed thousands of characters of instructions on pages called indexes.
+- **What changed:** the title may be a paragraph or a heading element; a page is skipped only when it states no effective date, and the remaining skips are the section indexes and two undated notes.
+
+## 2026-10-22: two versions of one instruction in force at once
+
+- **Proposed:** a slot's versions were the children whose titles end with a date. A child that ends with "(to 25/11/2018)" instead, the last version of a series the slot has since replaced, became a slot of its own, so its text and the version before it were both in force from 2017 to 2018, and three other parts overlapped the same way.
+- **How it was caught:** a check over the built rows for any part with two texts on one day, the same rule the index's exclusion constraint enforces, listed four overlaps before anything was loaded.
+- **What changed:** an ended child with no children of its own is a version of its slot, and a version that ends before the next one starts leaves a gap rather than running on. A test requires one text per part on any day, and another that a revoked instruction stops on its revocation date.
+
+## 2026-10-22: a retrieval run stamped dirty by a smoke question
+
+- **Proposed:** two live questions were asked with `provrag ask` before the immigration retrieval ablation. The second was new, so its vector was added to the committed cache, and the ablation that followed recorded its commit as dirty.
+- **How it was caught:** the commit printed at the end of the run carried the `-dirty` mark.
+- **What changed:** the cache was restored to the committed file and the ablation rerun from a clean tree; the dirty file was deleted, not committed.
+
+## 2026-10-22: "one points-based category" read as one point
+
+- **Proposed:** the number reader learned points, hours, ages and multiples for the immigration pack. Its count pattern read "one points-based skill category" as a count of one point, and its age pattern read a test result "no more than 2 years old" as the age of a person, while "55 years or younger" stayed a period of 55 years.
+- **How it was caught:** auditing the first full set of immigration runs, a correct answer about the 6 points the Points-based pathway needs was scored wrong, with a 1-point figure no cited passage gave; another run's "55 years or younger" failed the same way against passages that say "aged 55".
+- **What changed:** a count unit followed by a hyphen counts nothing, and an age is read only from "aged 55", "55 years of age" and "55 years or younger" or "older". Tests cover the three phrasings. The replay gate shows no New Zealand GST or German decision changed. The immigration runs had not been committed; they were deleted and every setting rerun from the fixed commit.

@@ -58,13 +58,21 @@ _PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("percent", re.compile(r"\b(\d+(?:\.\d+)?)\s*(?:%|per\s?cent\b)", re.I)),
     ("fraction", re.compile(r"\b(\d+)\s*/\s*(\d+)\b")),
     ("monthly", re.compile(rf"\b{_COUNT}[\s-]*monthly\b", re.I)),
-    ("age", re.compile(r"\baged\s+(\d{1,3})\b|\b(\d{1,3})\s+years?\s+(?:of\s+age|old)\b", re.I)),
+    # An age only where the words say so: "2 years old" is how old a test result may be.
+    (
+        "age",
+        re.compile(
+            r"\baged\s+(\d{1,3})\b|\b(\d{1,3})\s+years?\s+(?:of\s+age|or\s+(?:younger|older))\b",
+            re.I,
+        ),
+    ),
     ("multiple", re.compile(r"\b(\d+(?:\.\d+)?)\s*(?:times\b|x(?=\s))|\b(twice)\b", re.I)),
     (
         "count",
         re.compile(
             rf"\b{_COUNT}[\s-]+(?:(?:guaranteed|consecutive)\s+)?"
-            r"(working\s+days?|days?|weeks?|months?|years?|hours?|points?)\b",
+            # not followed by a hyphen: "one points-based category" counts nothing
+            r"(working\s+days?|days?|weeks?|months?|years?|hours?|points?)\b(?!-)",
             re.I,
         ),
     ),
