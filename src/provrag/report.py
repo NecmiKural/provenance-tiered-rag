@@ -88,9 +88,16 @@ def retrievals(
     return latest([r for r in found if r.get("questions", "development") == questions])
 
 
+def asks_advice(r: dict[str, Any]) -> bool:
+    """Only the immigration pack asks for assessments of the asker's own case."""
+    return bool(r["aggregate"].get("advice_refused", {}).get("n"))
+
+
 def held_back_table(
     dev: dict[str, Any], held: dict[str, Any], dev_r: dict | None, held_r: dict | None
 ) -> list[str]:
+    advice = asks_advice(dev)
+
     def rows(r: dict[str, Any], retrieval: dict | None) -> list[str]:
         a = r["aggregate"]
         recall = retrieval["methods"]["vector"]["all"]["recall_at_5"] if retrieval else None
@@ -98,6 +105,7 @@ def held_back_table(
             share(a["answerable_correct"]),
             share(a["unanswerable_refused"]),
             share(a["calculation_refused"]),
+            *([share(a["advice_refused"])] if advice else []),
             share(a["attacks_total"]["draft"]),
             share(a["attacks_total"]["final"]),
             share(recall) if recall else "n/a",
@@ -107,6 +115,7 @@ def held_back_table(
         "Answerable correct",
         "Not covered: refused",
         "Arithmetic: refused",
+        *(["Own case assessed: refused"] if advice else []),
         "Attacks, first draft",
         "Attacks, what the user saw",
         "Vector retrieval, gold passage in the top 5",
@@ -193,6 +202,11 @@ def main_table(main: dict[str, Any]) -> list[str]:
         ("Answers citing a labelled passage", share(a["answerable_citing_a_labelled_passage"])),
         ("Not covered by the sources: refused", share(a["unanswerable_refused"])),
         ("Needs arithmetic: refused", share(a["calculation_refused"])),
+        *(
+            [("Asks to assess the asker's own case: refused", share(a["advice_refused"]))]
+            if asks_advice(main)
+            else []
+        ),
         ("First drafts the verifier rejected", share(a["first_draft_failed"])),
         ("Of those, repaired and correct", share(a["repaired_and_correct"])),
         ("Refusals made by the verifier", share(a["refused_by_verifier"])),
@@ -273,24 +287,54 @@ def retrieval_table(r: dict[str, Any]) -> list[str]:
     return out
 
 
-def germany(results_dir: Path) -> list[str]:
-    """The German UStG section: one consolidation, German questions, the same measurements."""
-    runs = evals(results_dir, "de-vat")
+# The sections after New Zealand GST: heading, what was asked, which questions the sources do
+# not cover, a note on retrieval and the name of the held-back set.
+SECTIONS = {
+    "de-vat": (
+        "Germany: UStG and UStDV",
+        "German questions on the current consolidation of the UStG and UStDV",
+        "questions the sources do not cover, including dates before the consolidation,",
+        "Retrieval on the German questions, as above; the law has one consolidation, so"
+        " the date filter changes nothing here.",
+        "The German held-back quarter",
+    ),
+    "nz-immigration": (
+        "New Zealand immigration: the Operational Manual",
+        "Questions on the Skilled Migrant Category, Green List, Accredited Employer and"
+        " Post-Study work instructions, as they stand and as they stood on past dates,",
+        "questions the sources do not cover, including dates before the archive,",
+        "Retrieval on the immigration questions, as above. The index holds every archived"
+        " version of each instruction, so the run without the date filter shows what the"
+        " filter does.",
+        "The immigration held-back quarter",
+    ),
+}
+
+
+def pack_section(results_dir: Path, pack: str) -> list[str]:
+    """A further pack: the same measurements, from its own results files."""
+    title, subject, uncovered, retrieval_note, held_name = SECTIONS[pack]
+    runs = evals(results_dir, pack)
     if "on" not in runs:
         return []
     main = runs["on"]
     a = main["aggregate"]
     right = a["answerable_correct"]
-    retrieval = retrievals(results_dir, "development", "de-vat")
+    retrieval = retrievals(results_dir, "development", pack)
     off = runs.get("off")
+    refusals = (
+        f", arithmetic in {share(a['calculation_refused'])}, and requests to assess the"
+        f" asker's own case in {share(a['advice_refused'])}"
+        if asks_advice(main)
+        else f", and arithmetic in {share(a['calculation_refused'])}"
+    )
     text = (
-        f"German questions on the current consolidation of the UStG and UStDV, with every"
+        f"{subject}, with every"
         f" defence on: {right['k']} of {right['n']} answers to answerable questions were correct"
-        f" (95% lower bound {pct(right['ci95'][0])}) over {main['repeats']} runs; questions the"
-        f" sources do not cover, including dates before the consolidation, were refused in"
-        f" {share(a['unanswerable_refused'])} runs, and arithmetic in"
-        f" {share(a['calculation_refused'])}. With a payload note placed in the context,"
-        f" {share(a['attacks_total']['final'])} attacked answers did what the payload asked"
+        f" (95% lower bound {pct(right['ci95'][0])}) over {main['repeats']} runs; {uncovered}"
+        f" were refused in {share(a['unanswerable_refused'])} runs{refusals}. With a payload"
+        f" note placed in the context, {share(a['attacks_total']['final'])} attacked answers did"
+        " what the payload asked"
     )
     if off:
         text += (
@@ -299,7 +343,7 @@ def germany(results_dir: Path) -> list[str]:
         )
     out = [
         "",
-        "### Germany: UStG and UStDV",
+        f"### {title}",
         "",
         text + ".",
         "",
@@ -308,26 +352,24 @@ def germany(results_dir: Path) -> list[str]:
         f"Prompt `{main['prompt_sha']}`, retrieval `{main['method']}` with k={main['k']};"
         f" commit `{main['commit']}`.",
         "",
-        *attack_table(main, retrieval, "de-vat"),
+        *attack_table(main, retrieval, pack),
         "",
         *ablation_table(runs),
     ]
     if retrieval:
         out += [
             "",
-            "Retrieval on the German questions, as above; the law has one consolidation, so"
-            f" the date filter changes nothing here. Commit `{retrieval['commit']}`.",
+            f"{retrieval_note} Commit `{retrieval['commit']}`.",
             "",
             *retrieval_table(retrieval),
         ]
-    held = held_back(results_dir, "de-vat")
+    held = held_back(results_dir, pack)
     if held:
         out += [
             "",
-            "The German held-back quarter, run once at the end with every defence on."
-            f" Commit `{held['commit']}`.",
+            f"{held_name}, run once at the end with every defence on. Commit `{held['commit']}`.",
             "",
-            *held_back_table(main, held, retrieval, retrievals(results_dir, "held_back", "de-vat")),
+            *held_back_table(main, held, retrieval, retrievals(results_dir, "held_back", pack)),
         ]
     return out
 
@@ -405,7 +447,8 @@ def render(results_dir: Path) -> str:
             "",
             *retrieval_table(retrieval),
         ]
-    lines += germany(results_dir)
+    for pack in SECTIONS:
+        lines += pack_section(results_dir, pack)
     latency = latency_table(results_dir)
     if latency:
         lines += [
