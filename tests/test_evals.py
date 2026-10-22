@@ -13,7 +13,7 @@ from provrag.numbers import extract, numbers
 from provrag.packs import PACKS
 
 ROOT = Path(__file__).resolve().parents[1]
-PACK_IDS = ("nz-gst", "de-vat")
+PACK_IDS = ("nz-gst", "de-vat", "nz-immigration")
 
 # sha256 of each frozen file. Changing one needs a docs/agent-log.md entry saying why.
 FROZEN = {
@@ -31,11 +31,23 @@ FROZEN = {
     ),
     "evals/de/payloads.jsonl": ("355ebfb419c7561bd1f607eb007e691f9fce696723b260e543e12fe19841a8fa"),
     "corpus/de/notes.jsonl": ("59f3f3ac074a7db9fb3463a2806c8cfa6d1877790b2bf05c334afdc7e88ac71e"),
+    "evals/nz-immigration/questions.jsonl": (
+        "d74962b02c6e148fe67fb1b9bb3f7aa7e6902602035100a210c08390fac58472"
+    ),
+    "evals/nz-immigration/questions-held-back.jsonl": (
+        "feb07d55383fc567eda4f366e4f9092df5f19dfa105ae4ffd356a6279d91b97b"
+    ),
+    "evals/nz-immigration/payloads.jsonl": (
+        "afc75d2e266b1fe1943487171e67ca28a15f757b287bc061819c45755eb1119f"
+    ),
+    "corpus/nz-immigration/notes.jsonl": (
+        "115067d782b19fb0a36f643fb212cdad0dca46dcc52cefdcc7606cd6aece1c21"
+    ),
 }
-PAYLOADS_PER_GOAL = {"nz-gst": 8, "de-vat": 4}
+PAYLOADS_PER_GOAL = {"nz-gst": 8, "de-vat": 4, "nz-immigration": 4}
 # Planted figures that some passage in force also states; scoring pairs those attacks with the
 # clean run (see the agent log, 2026-10-22).
-KNOWN_COLLISIONS = {"nz-gst": {"P04", "P07"}, "de-vat": {"DP04"}}
+KNOWN_COLLISIONS = {"nz-gst": {"P04", "P07"}, "de-vat": {"DP04"}, "nz-immigration": set()}
 
 
 @cache
@@ -84,9 +96,10 @@ def test_the_eval_set_is_frozen(path):
 def test_ids_kinds_and_split(j):
     s = eval_set(j)
     assert len(s["questions"]) == len(s["dev"]) + len(s["held"])
-    assert {q["kind"] for q in s["questions"].values()} == set(evalset.KINDS)
+    kinds = {q["kind"] for q in s["questions"].values()}
+    assert {"answerable", "unanswerable", "calculation"} <= kinds <= set(evalset.KINDS)
     assert 0.2 <= len(s["held"]) / len(s["questions"]) <= 0.3
-    for kind in evalset.KINDS:
+    for kind in kinds:
         assert any(q["kind"] == kind for q in s["held"]), kind
 
 
@@ -114,7 +127,7 @@ def test_other_questions_have_no_labels(pair):
 
 @pytest.mark.parametrize("j", PACK_IDS)
 def test_questions_about_dates_before_the_corpus_are_unanswerable(j):
-    first = min(c.valid_from for c in eval_set(j)["chunks"] if c.tier == "T1")
+    first = min(c.valid_from for c in eval_set(j)["chunks"] if c.tier in ("T1", "T2"))
     early = [q for q in eval_set(j)["questions"].values() if q["as_of"] < first]
     assert early and all(q["kind"] == "unanswerable" for q in early)
 

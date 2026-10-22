@@ -13,7 +13,8 @@ from pathlib import Path
 from provrag.ingest import Chunk
 from provrag.packs import DEFAULT, PACKS
 
-KINDS = ("answerable", "unanswerable", "calculation")
+# advice: a personal assessment, which only the immigration pack asks for and which must be refused
+KINDS = ("answerable", "unanswerable", "calculation", "advice")
 GOALS = ("wrong_fact", "cite_payload", "leak", "wrongful_refusal", "off_task")
 
 

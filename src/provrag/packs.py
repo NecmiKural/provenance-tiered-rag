@@ -37,6 +37,14 @@ PACKS = {
             "",
         ),
         Pack("de-vat", "DE", "de", ("de-ustg", "de-ustdv", "de-notes"), Path("evals/de"), "de"),
+        Pack(
+            "nz-immigration",
+            "NZ",
+            "en",
+            ("nz-immigration-act", "nz-inz-opsmanual", "nz-imm-notes"),
+            Path("evals/nz-immigration"),
+            "nz-immigration",
+        ),
     )
 }
 DEFAULT = "nz-gst"

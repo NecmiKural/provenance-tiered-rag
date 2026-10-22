@@ -19,6 +19,7 @@ from provrag import (
     ingest,
     latency,
     legislation,
+    opsmanual,
     packs,
     report,
     results,
@@ -53,6 +54,8 @@ def cmd_fetch(args: argparse.Namespace) -> None:
         elif "gii" in source:
             items = source.get("items", {})
             rows = gii.build(source["gii"], {s: items.get(s) for s in source["sections"]})
+        elif "opsmanual" in source:
+            rows = opsmanual.build(source["opsmanual"], opsmanual.CACHE)
         else:
             continue
         path = Path(source["path"])

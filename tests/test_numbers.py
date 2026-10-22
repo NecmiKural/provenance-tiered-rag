@@ -30,6 +30,15 @@ from provrag.numbers import extract, numbers
         ("six-monthly filers", [("count:month", "6")]),
         ("2-monthly filing", [("count:month", "2")]),
         ("multiply by 3/23", [("fraction", "3/23")]),
+        ("must qualify for 6 points", [("count:point", "6")]),
+        ("at least 30 guaranteed hours per week", [("count:hour", "30")]),
+        ("for a minimum of 12 consecutive months", [("count:month", "12")]),
+        ("be aged 55 or younger", [("age", "55")]),
+        ("applicants 55 years of age or under", [("age", "55")]),
+        ("paid 1.5 times the SMC wage threshold", [("multiple", "1.5")]),
+        ("earning at least twice the median wage", [("multiple", "2")]),
+        ("1.15x the median wage", [("multiple", "1.15")]),
+        ("no more than two years old", [("count:year", "2")]),
     ],
 )
 def test_each_kind_reads_its_value(text, expected):

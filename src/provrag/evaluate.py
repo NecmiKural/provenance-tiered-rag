@@ -311,6 +311,7 @@ def aggregate(runs: list[list[dict[str, Any]]], pack: str = DEFAULT) -> dict[str
         ),
         "unanswerable_refused": share(by("unanswerable"), "correct"),
         "calculation_refused": share(by("calculation"), "correct"),
+        "advice_refused": share(by("advice"), "correct"),
         "answers_failing_verifier": rate(
             sum(not i["passes_verifier"] for i in answers), len(answers)
         ),

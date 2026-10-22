@@ -2,8 +2,9 @@
 
 A number is a (kind, value) pair, so "15 days" can never support "15%", and "15 percent" and
 "15%" are the same number. Kinds: percent, money (in cents), date (ISO), day and month without
-a year, fraction, a count with a unit (days, weeks, months, years; "2-monthly" is a count of
-months) and a day of the month ("the 28th").
+a year, fraction, a count with a unit (days, weeks, months, years, hours, points; "2-monthly"
+is a count of months), an age ("aged 55"), a multiple ("1.5 times", "twice") and a day of the
+month ("the 28th").
 
 Section references ("s 8(1)", "section 51", "subsection (2)") and paragraph labels are not
 numbers here, and bare figures without a kind are ignored.
@@ -57,9 +58,15 @@ _PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("percent", re.compile(r"\b(\d+(?:\.\d+)?)\s*(?:%|per\s?cent\b)", re.I)),
     ("fraction", re.compile(r"\b(\d+)\s*/\s*(\d+)\b")),
     ("monthly", re.compile(rf"\b{_COUNT}[\s-]*monthly\b", re.I)),
+    ("age", re.compile(r"\baged\s+(\d{1,3})\b|\b(\d{1,3})\s+years?\s+(?:of\s+age|old)\b", re.I)),
+    ("multiple", re.compile(r"\b(\d+(?:\.\d+)?)\s*(?:times\b|x(?=\s))|\b(twice)\b", re.I)),
     (
         "count",
-        re.compile(rf"\b{_COUNT}[\s-]+(working\s+days?|days?|weeks?|months?|years?)\b", re.I),
+        re.compile(
+            rf"\b{_COUNT}[\s-]+(?:(?:guaranteed|consecutive)\s+)?"
+            r"(working\s+days?|days?|weeks?|months?|years?|hours?|points?)\b",
+            re.I,
+        ),
     ),
     ("day_of_month", re.compile(r"\b(\d{1,2})(?:st|nd|rd|th)\b", re.I)),
 ]
@@ -91,6 +98,10 @@ def _read(kind: str, g: tuple[str, ...]) -> Number:
         return "fraction", f"{int(g[0])}/{int(g[1])}"
     if kind == "monthly":
         return "count:month", str(_int(g[0]))
+    if kind == "age":
+        return "age", str(int(g[0] or g[1]))
+    if kind == "multiple":
+        return "multiple", "2" if g[1] else format(Decimal(g[0]).normalize(), "f")
     if kind == "count":
         unit = re.sub(r"\s+", "_", g[1].lower()).removesuffix("s")
         return f"count:{unit}", str(_int(g[0]))

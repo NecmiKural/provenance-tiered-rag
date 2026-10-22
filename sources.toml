@@ -87,3 +87,41 @@ title = "Forenbeiträge und Notizen"
 licence = "Written for this project (MIT). Some carry prompt-injection payloads on purpose"
 path = "corpus/de/notes.jsonl"
 sha256 = "59f3f3ac074a7db9fb3463a2806c8cfa6d1877790b2bf05c334afdc7e88ac71e"
+
+[[source]]
+id = "nz-immigration-act"
+tier = "T1"
+jurisdiction = "NZ"
+title = "Immigration Act 2009"
+act = "/act/public/2009/51/en/"
+licence = "No copyright in New Zealand legislation (Copyright Act 1994, s 27)"
+# The sections under which immigration instructions are made, classed, published and applied.
+first_version = "2022-04-12"
+last_version = "2026-07-10"
+sections = ["22", "23", "25", "26"]
+path = "corpus/nz-immigration/immigration-act.jsonl"
+sha256 = "f432aebf251acca69f996a3c815c47a18a34afc4d7b5d6068749a329ea0def52"
+
+[[source]]
+id = "nz-inz-opsmanual"
+tier = "T2"
+jurisdiction = "NZ"
+title = "Immigration New Zealand Operational Manual"
+site = "https://www.immigration.govt.nz/opsmanual/"
+licence = "Crown copyright, Ministry of Business, Innovation and Employment. Text reproduced under CC BY 3.0 NZ; logos and design excluded"
+retrieved = "2026-10-22"
+# Table of contents entries: SR3 Skilled Migrant Category, SR4 Green List: Straight to
+# Residence, SR5 Green List: Work to Residence, WA4 Accredited Employer work visa and WD
+# Post-Study work, each with every archived version the manual keeps.
+opsmanual = ["77809.htm", "77815.htm", "77821.htm", "77097.htm", "71681.htm"]
+path = "corpus/nz-immigration/opsmanual.jsonl"
+sha256 = "5a7866661270c544c7e0ea622aef7c8099bd357302c008c9660156e7f166d43e"
+
+[[source]]
+id = "nz-imm-notes"
+tier = "T3"
+jurisdiction = "NZ"
+title = "Migrant forum posts and notes"
+licence = "Written for this project (MIT). Some carry prompt-injection payloads on purpose"
+path = "corpus/nz-immigration/notes.jsonl"
+sha256 = "115067d782b19fb0a36f643fb212cdad0dca46dcc52cefdcc7606cd6aece1c21"
