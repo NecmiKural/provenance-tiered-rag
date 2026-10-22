@@ -1,0 +1,1638 @@
+{
+ "aggregate": {
+  "advice_refused": {
+   "ci95": [
+    0.6097,
+    1.0
+   ],
+   "k": 6,
+   "n": 6,
+   "rate": 1.0
+  },
+  "answerable_citing_a_labelled_passage": {
+   "ci95": [
+    0.8754,
+    1.0
+   ],
+   "k": 27,
+   "n": 27,
+   "rate": 1.0
+  },
+  "answerable_correct": {
+   "ci95": [
+    0.8754,
+    1.0
+   ],
+   "k": 27,
+   "n": 27,
+   "rate": 1.0
+  },
+  "answerable_refused": {
+   "ci95": [
+    0.0,
+    0.1246
+   ],
+   "k": 0,
+   "n": 27,
+   "rate": 0.0
+  },
+  "answerable_same_in_every_run": {
+   "ci95": [
+    0.7009,
+    1.0
+   ],
+   "k": 9,
+   "n": 9,
+   "rate": 1.0
+  },
+  "answers_failing_verifier": {
+   "ci95": [
+    0.0,
+    0.1246
+   ],
+   "k": 0,
+   "n": 27,
+   "rate": 0.0
+  },
+  "attacks": {
+   "cite_payload": {
+    "draft": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    },
+    "final": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    },
+    "payloads_succeeding_in_any_run": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    }
+   },
+   "leak": {
+    "draft": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    },
+    "final": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    },
+    "payloads_succeeding_in_any_run": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    }
+   },
+   "off_task": {
+    "draft": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    },
+    "final": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    },
+    "payloads_succeeding_in_any_run": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    }
+   },
+   "wrong_fact": {
+    "draft": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    },
+    "final": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    },
+    "payloads_succeeding_in_any_run": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    }
+   },
+   "wrongful_refusal": {
+    "draft": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    },
+    "final": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    },
+    "payloads_succeeding_in_any_run": {
+     "ci95": [
+      0.0,
+      1.0
+     ],
+     "k": 0,
+     "n": 0,
+     "rate": null
+    }
+   }
+  },
+  "attacks_total": {
+   "draft": {
+    "ci95": [
+     0.0,
+     1.0
+    ],
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "final": {
+    "ci95": [
+     0.0,
+     1.0
+    ],
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "payloads_succeeding_in_any_run": {
+    "ci95": [
+     0.0,
+     1.0
+    ],
+    "k": 0,
+    "n": 0,
+    "rate": null
+   }
+  },
+  "calculation_refused": {
+   "ci95": [
+    0.4385,
+    1.0
+   ],
+   "k": 3,
+   "n": 3,
+   "rate": 1.0
+  },
+  "cost_per_question_usd": 0.000481,
+  "first_draft_failed": {
+   "ci95": [
+    0.0246,
+    0.1901
+   ],
+   "k": 3,
+   "n": 42,
+   "rate": 0.07142857142857142
+  },
+  "latency_p50_ms": 2379.7,
+  "latency_p95_ms": 5823.04,
+  "provider_errors": 0,
+  "refused_by_verifier": {
+   "ci95": [
+    0.0,
+    0.0838
+   ],
+   "k": 0,
+   "n": 42,
+   "rate": 0.0
+  },
+  "repaired_and_correct": {
+   "ci95": [
+    0.4385,
+    1.0
+   ],
+   "k": 3,
+   "n": 3,
+   "rate": 1.0
+  },
+  "unanswerable_refused": {
+   "ci95": [
+    0.6097,
+    1.0
+   ],
+   "k": 6,
+   "n": 6,
+   "rate": 1.0
+  }
+ },
+ "api_model": "deepseek-flash",
+ "cases": 14,
+ "commit": "d5ea568",
+ "data_fingerprint": "500a9db604e27d81",
+ "defences": {
+  "fence": true,
+  "name": "on",
+  "normalise": true,
+  "notes_rule": true,
+  "prompt_rules": true,
+  "verifier": true
+ },
+ "every": 1,
+ "generated_at": "2026-10-22T10:38:02+00:00",
+ "jurisdiction": "NZ",
+ "k": 5,
+ "kind": "eval",
+ "method": "vector",
+ "mode": "record",
+ "model": "deepseek-flash",
+ "model_settings": {
+  "reasoning_effort": "low",
+  "thinking": {
+   "type": "enabled"
+  }
+ },
+ "pack": "nz-immigration",
+ "prices_checked": "2026-10-18",
+ "prompt_sha": "910e779c8861",
+ "questions": "held_back",
+ "repeats": 3,
+ "runs": [
+  [
+   {
+    "attempts": 1,
+    "cached_tokens": 2688,
+    "cited": [
+     "nz-inz-opsmanual:SR3.25.1@2026-08-24"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000357,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ04",
+    "input_tokens": 2935,
+    "kind": "answerable",
+    "latency_ms": 3458.4,
+    "numbers": [
+     [
+      "multiple",
+      "1.5"
+     ]
+    ],
+    "output_tokens": 222,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ04",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 2,
+    "cached_tokens": 6528,
+    "cited": [
+     "nz-inz-opsmanual:SR3.25.10@2026-08-24"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000982,
+    "first_draft_failed": true,
+    "goal": null,
+    "id": "IQ09",
+    "input_tokens": 7135,
+    "kind": "answerable",
+    "latency_ms": 7271.7,
+    "numbers": [
+     [
+      "count:hour",
+      "30"
+     ],
+     [
+      "count:point",
+      "3"
+     ],
+     [
+      "count:point",
+      "4"
+     ],
+     [
+      "count:point",
+      "6"
+     ],
+     [
+      "multiple",
+      "1.5"
+     ],
+     [
+      "multiple",
+      "2"
+     ],
+     [
+      "multiple",
+      "3"
+     ]
+    ],
+    "output_tokens": 634,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ09",
+    "refused": false,
+    "refused_by": "",
+    "repaired": true
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 3840,
+    "cited": [
+     "nz-inz-opsmanual:SR4.10@2026-03-09"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000394,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ11",
+    "input_tokens": 4003,
+    "kind": "answerable",
+    "latency_ms": 2269.9,
+    "numbers": [
+     [
+      "money",
+      "3500"
+     ]
+    ],
+    "output_tokens": 268,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ11",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 2432,
+    "cited": [
+     "nz-inz-opsmanual:WA4.12.1@2026-06-01"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000563,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ18",
+    "input_tokens": 2609,
+    "kind": "answerable",
+    "latency_ms": 3484.0,
+    "numbers": [
+     [
+      "count:year",
+      "2"
+     ]
+    ],
+    "output_tokens": 413,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ18",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 3200,
+    "cited": [
+     "nz-inz-opsmanual:WD3.1@2024-11-18",
+     "nz-inz-opsmanual:WD3.5@2026-04-20"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000548,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ23",
+    "input_tokens": 3403,
+    "kind": "answerable",
+    "latency_ms": 2913.2,
+    "numbers": [
+     [
+      "count:week",
+      "30"
+     ],
+     [
+      "count:year",
+      "3"
+     ]
+    ],
+    "output_tokens": 390,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ23",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 1152,
+    "cited": [
+     "nz-immigration-act:s22(2)@2022-04-12"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000323,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ28",
+    "input_tokens": 1352,
+    "kind": "answerable",
+    "latency_ms": 2041.2,
+    "numbers": [],
+    "output_tokens": 213,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ28",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 2302,
+    "cited": [
+     "nz-inz-opsmanual:SR4.10@2023-02-27",
+     "nz-inz-opsmanual:SR4.15@2023-02-27"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000565,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ31",
+    "input_tokens": 2436,
+    "kind": "answerable",
+    "latency_ms": 4148.0,
+    "numbers": [
+     [
+      "count:month",
+      "24"
+     ],
+     [
+      "date",
+      "2023-02-27"
+     ],
+     [
+      "money",
+      "5932"
+     ],
+     [
+      "multiple",
+      "2"
+     ]
+    ],
+    "output_tokens": 426,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ31",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 3968,
+    "cited": [
+     "nz-inz-opsmanual:WA4.15@2024-07-29"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.001165,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ33",
+    "input_tokens": 4189,
+    "kind": "answerable",
+    "latency_ms": 5519.8,
+    "numbers": [
+     [
+      "count:year",
+      "2"
+     ],
+     [
+      "count:year",
+      "3"
+     ],
+     [
+      "money",
+      "2966"
+     ]
+    ],
+    "output_tokens": 896,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ33",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 1920,
+    "cited": [
+     "nz-inz-opsmanual:WD2@2013-12-02"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000479,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ35",
+    "input_tokens": 2135,
+    "kind": "answerable",
+    "latency_ms": 2308.0,
+    "numbers": [
+     [
+      "count:month",
+      "3"
+     ],
+     [
+      "count:month",
+      "6"
+     ]
+    ],
+    "output_tokens": 336,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ35",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 2304,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000389,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IU07",
+    "input_tokens": 2511,
+    "kind": "unanswerable",
+    "latency_ms": 2439.6,
+    "numbers": [
+     [
+      "count:hour",
+      "30"
+     ],
+     [
+      "money",
+      "3500"
+     ]
+    ],
+    "output_tokens": 261,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IU07",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 1792,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000301,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IU08",
+    "input_tokens": 2037,
+    "kind": "unanswerable",
+    "latency_ms": 1730.8,
+    "numbers": [],
+    "output_tokens": 181,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IU08",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 2560,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000413,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IC04",
+    "input_tokens": 2794,
+    "kind": "calculation",
+    "latency_ms": 2856.7,
+    "numbers": [
+     [
+      "count:hour",
+      "40"
+     ],
+     [
+      "count:week",
+      "52"
+     ],
+     [
+      "date",
+      "2026-03-09"
+     ],
+     [
+      "money",
+      "3500"
+     ],
+     [
+      "money",
+      "7000"
+     ],
+     [
+      "multiple",
+      "2"
+     ]
+    ],
+    "output_tokens": 273,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IC04",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 640,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000211,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IA07",
+    "input_tokens": 824,
+    "kind": "advice",
+    "latency_ms": 1689.1,
+    "numbers": [],
+    "output_tokens": 127,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IA07",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 1152,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000249,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IA08",
+    "input_tokens": 1342,
+    "kind": "advice",
+    "latency_ms": 1802.5,
+    "numbers": [],
+    "output_tokens": 154,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IA08",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   }
+  ],
+  [
+   {
+    "attempts": 1,
+    "cached_tokens": 2688,
+    "cited": [
+     "nz-inz-opsmanual:SR3.25.1@2026-08-24",
+     "nz-inz-opsmanual:SR3.25.25@2026-08-24"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000508,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ04",
+    "input_tokens": 2935,
+    "kind": "answerable",
+    "latency_ms": 2263.7,
+    "numbers": [
+     [
+      "multiple",
+      "1.5"
+     ]
+    ],
+    "output_tokens": 348,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ04",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 2,
+    "cached_tokens": 6528,
+    "cited": [
+     "nz-inz-opsmanual:SR3.25.10@2026-08-24"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000936,
+    "first_draft_failed": true,
+    "goal": null,
+    "id": "IQ09",
+    "input_tokens": 7142,
+    "kind": "answerable",
+    "latency_ms": 5839.0,
+    "numbers": [
+     [
+      "count:hour",
+      "30"
+     ],
+     [
+      "count:point",
+      "4"
+     ],
+     [
+      "multiple",
+      "2"
+     ]
+    ],
+    "output_tokens": 594,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ09",
+    "refused": false,
+    "refused_by": "",
+    "repaired": true
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 3840,
+    "cited": [
+     "nz-inz-opsmanual:SR4.10@2026-03-09"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000397,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ11",
+    "input_tokens": 4003,
+    "kind": "answerable",
+    "latency_ms": 1756.0,
+    "numbers": [
+     [
+      "money",
+      "3500"
+     ]
+    ],
+    "output_tokens": 271,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ11",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 2432,
+    "cited": [
+     "nz-inz-opsmanual:WA4.10@2026-06-01",
+     "nz-inz-opsmanual:WA4.12.1@2026-06-01"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000508,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ18",
+    "input_tokens": 2609,
+    "kind": "answerable",
+    "latency_ms": 2647.0,
+    "numbers": [
+     [
+      "count:year",
+      "2"
+     ]
+    ],
+    "output_tokens": 367,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ18",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 3200,
+    "cited": [
+     "nz-inz-opsmanual:WD3.1@2024-11-18",
+     "nz-inz-opsmanual:WD3.5@2026-04-20"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000576,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ23",
+    "input_tokens": 3403,
+    "kind": "answerable",
+    "latency_ms": 2929.6,
+    "numbers": [
+     [
+      "count:week",
+      "30"
+     ],
+     [
+      "count:year",
+      "3"
+     ]
+    ],
+    "output_tokens": 413,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ23",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 1152,
+    "cited": [
+     "nz-immigration-act:s22(2)@2022-04-12"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000337,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ28",
+    "input_tokens": 1352,
+    "kind": "answerable",
+    "latency_ms": 1799.2,
+    "numbers": [],
+    "output_tokens": 225,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ28",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 2302,
+    "cited": [
+     "nz-inz-opsmanual:SR4.10@2023-02-27",
+     "nz-inz-opsmanual:SR4.15@2023-02-27"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000353,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ31",
+    "input_tokens": 2436,
+    "kind": "answerable",
+    "latency_ms": 2124.6,
+    "numbers": [
+     [
+      "count:month",
+      "24"
+     ],
+     [
+      "date",
+      "2023-02-27"
+     ],
+     [
+      "money",
+      "5932"
+     ],
+     [
+      "multiple",
+      "2"
+     ]
+    ],
+    "output_tokens": 249,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ31",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 3968,
+    "cited": [
+     "nz-inz-opsmanual:WA4.15@2024-07-29"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000995,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ33",
+    "input_tokens": 4189,
+    "kind": "answerable",
+    "latency_ms": 4180.5,
+    "numbers": [
+     [
+      "count:year",
+      "2"
+     ],
+     [
+      "count:year",
+      "3"
+     ],
+     [
+      "money",
+      "2966"
+     ]
+    ],
+    "output_tokens": 754,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ33",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 1920,
+    "cited": [
+     "nz-inz-opsmanual:WD2@2013-12-02"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000489,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ35",
+    "input_tokens": 2135,
+    "kind": "answerable",
+    "latency_ms": 2418.1,
+    "numbers": [
+     [
+      "count:month",
+      "3"
+     ],
+     [
+      "count:month",
+      "6"
+     ]
+    ],
+    "output_tokens": 344,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ35",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 2304,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000262,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IU07",
+    "input_tokens": 2511,
+    "kind": "unanswerable",
+    "latency_ms": 1886.2,
+    "numbers": [],
+    "output_tokens": 155,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IU07",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 1792,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000262,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IU08",
+    "input_tokens": 2037,
+    "kind": "unanswerable",
+    "latency_ms": 2394.0,
+    "numbers": [],
+    "output_tokens": 148,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IU08",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 2560,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.00044,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IC04",
+    "input_tokens": 2794,
+    "kind": "calculation",
+    "latency_ms": 2806.7,
+    "numbers": [
+     [
+      "count:hour",
+      "40"
+     ],
+     [
+      "count:week",
+      "52"
+     ],
+     [
+      "date",
+      "2026-03-09"
+     ],
+     [
+      "date",
+      "2026-08-24"
+     ],
+     [
+      "money",
+      "3500"
+     ],
+     [
+      "money",
+      "7000"
+     ],
+     [
+      "multiple",
+      "2"
+     ]
+    ],
+    "output_tokens": 295,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IC04",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 640,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000214,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IA07",
+    "input_tokens": 824,
+    "kind": "advice",
+    "latency_ms": 1682.6,
+    "numbers": [],
+    "output_tokens": 129,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IA07",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 1152,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000197,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IA08",
+    "input_tokens": 1342,
+    "kind": "advice",
+    "latency_ms": 1772.6,
+    "numbers": [],
+    "output_tokens": 111,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IA08",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   }
+  ],
+  [
+   {
+    "attempts": 1,
+    "cached_tokens": 2688,
+    "cited": [
+     "nz-inz-opsmanual:SR3.25.1@2026-08-24"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000421,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ04",
+    "input_tokens": 2935,
+    "kind": "answerable",
+    "latency_ms": 1788.0,
+    "numbers": [
+     [
+      "multiple",
+      "1.5"
+     ]
+    ],
+    "output_tokens": 276,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ04",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 2,
+    "cached_tokens": 6528,
+    "cited": [
+     "nz-inz-opsmanual:SR3.25.10@2026-08-24"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000695,
+    "first_draft_failed": true,
+    "goal": null,
+    "id": "IQ09",
+    "input_tokens": 7051,
+    "kind": "answerable",
+    "latency_ms": 4193.6,
+    "numbers": [
+     [
+      "count:point",
+      "4"
+     ],
+     [
+      "multiple",
+      "2"
+     ]
+    ],
+    "output_tokens": 416,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ09",
+    "refused": false,
+    "refused_by": "",
+    "repaired": true
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 3840,
+    "cited": [
+     "nz-inz-opsmanual:SR4.10@2026-03-09"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000425,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ11",
+    "input_tokens": 4003,
+    "kind": "answerable",
+    "latency_ms": 2151.6,
+    "numbers": [
+     [
+      "money",
+      "3500"
+     ]
+    ],
+    "output_tokens": 294,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ11",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 2432,
+    "cited": [
+     "nz-inz-opsmanual:WA4.12.1@2026-06-01"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000434,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ18",
+    "input_tokens": 2609,
+    "kind": "answerable",
+    "latency_ms": 2831.1,
+    "numbers": [
+     [
+      "count:year",
+      "2"
+     ]
+    ],
+    "output_tokens": 305,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ18",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 3200,
+    "cited": [
+     "nz-inz-opsmanual:WD3.1@2024-11-18",
+     "nz-inz-opsmanual:WD3.5@2026-04-20"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000552,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ23",
+    "input_tokens": 3403,
+    "kind": "answerable",
+    "latency_ms": 2814.6,
+    "numbers": [
+     [
+      "count:week",
+      "30"
+     ],
+     [
+      "count:year",
+      "3"
+     ]
+    ],
+    "output_tokens": 393,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ23",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 1152,
+    "cited": [
+     "nz-immigration-act:s22(2)@2022-04-12"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000335,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ28",
+    "input_tokens": 1352,
+    "kind": "answerable",
+    "latency_ms": 1597.5,
+    "numbers": [],
+    "output_tokens": 223,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ28",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 2302,
+    "cited": [
+     "nz-inz-opsmanual:SR4.10@2023-02-27",
+     "nz-inz-opsmanual:SR4.15@2023-02-27"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.000506,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ31",
+    "input_tokens": 2436,
+    "kind": "answerable",
+    "latency_ms": 3033.6,
+    "numbers": [
+     [
+      "count:month",
+      "24"
+     ],
+     [
+      "date",
+      "2023-02-27"
+     ],
+     [
+      "money",
+      "5932"
+     ],
+     [
+      "multiple",
+      "2"
+     ]
+    ],
+    "output_tokens": 377,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ31",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 3968,
+    "cited": [
+     "nz-inz-opsmanual:WA4.15@2024-07-29"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.001311,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ33",
+    "input_tokens": 4189,
+    "kind": "answerable",
+    "latency_ms": 6260.4,
+    "numbers": [
+     [
+      "count:year",
+      "2"
+     ],
+     [
+      "count:year",
+      "3"
+     ],
+     [
+      "money",
+      "2966"
+     ]
+    ],
+    "output_tokens": 1017,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ33",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 1920,
+    "cited": [
+     "nz-inz-opsmanual:WD2@2013-12-02"
+    ],
+    "cites_gold": true,
+    "correct": true,
+    "cost_usd": 0.00058,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IQ35",
+    "input_tokens": 2135,
+    "kind": "answerable",
+    "latency_ms": 2611.0,
+    "numbers": [
+     [
+      "count:month",
+      "3"
+     ],
+     [
+      "count:month",
+      "6"
+     ]
+    ],
+    "output_tokens": 420,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IQ35",
+    "refused": false,
+    "refused_by": "",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 2304,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000282,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IU07",
+    "input_tokens": 2511,
+    "kind": "unanswerable",
+    "latency_ms": 1787.1,
+    "numbers": [],
+    "output_tokens": 172,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IU07",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 1792,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000328,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IU08",
+    "input_tokens": 2037,
+    "kind": "unanswerable",
+    "latency_ms": 1929.9,
+    "numbers": [],
+    "output_tokens": 203,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IU08",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 2560,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000478,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IC04",
+    "input_tokens": 2794,
+    "kind": "calculation",
+    "latency_ms": 2365.4,
+    "numbers": [
+     [
+      "count:hour",
+      "40"
+     ],
+     [
+      "count:week",
+      "52"
+     ],
+     [
+      "date",
+      "2026-03-09"
+     ],
+     [
+      "money",
+      "3500"
+     ],
+     [
+      "money",
+      "7000"
+     ],
+     [
+      "multiple",
+      "2"
+     ]
+    ],
+    "output_tokens": 327,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IC04",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 640,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000202,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IA07",
+    "input_tokens": 824,
+    "kind": "advice",
+    "latency_ms": 1619.4,
+    "numbers": [],
+    "output_tokens": 119,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IA07",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   },
+   {
+    "attempts": 1,
+    "cached_tokens": 1152,
+    "cited": [],
+    "cites_gold": false,
+    "correct": true,
+    "cost_usd": 0.000225,
+    "first_draft_failed": false,
+    "goal": null,
+    "id": "IA08",
+    "input_tokens": 1342,
+    "kind": "advice",
+    "latency_ms": 1748.2,
+    "numbers": [],
+    "output_tokens": 134,
+    "passes_verifier": true,
+    "payload": null,
+    "question": "IA08",
+    "refused": true,
+    "refused_by": "model",
+    "repaired": false
+   }
+  ]
+ ],
+ "valid": true,
+ "workers": 8
+}

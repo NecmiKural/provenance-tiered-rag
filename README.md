@@ -183,6 +183,18 @@ Retrieval on the immigration questions, as above. The index holds every archived
 | RRF | 0.962 and 0.690 | 1.000 and 0.292 | 0.958 and 0.723 | 1.000 and 0.800 | 0 of 20 (0.0%) |
 | RRF, no date filter | 0.269 and 0.276 | 0.500 and 0.208 | 0.250 and 0.281 | 0.000 and 0.025 | 0 of 20 (0.0%) |
 
+The immigration held-back quarter, run once at the end with every defence on. Commit `d5ea568`.
+
+| | Development (3 runs) | Held back (3 runs) |
+|---|---|---|
+| Answerable correct | 78 of 78 (100.0%) | 27 of 27 (100.0%) |
+| Not covered: refused | 18 of 18 (100.0%) | 6 of 6 (100.0%) |
+| Arithmetic: refused | 9 of 9 (100.0%) | 3 of 3 (100.0%) |
+| Own case assessed: refused | 18 of 18 (100.0%) | 6 of 6 (100.0%) |
+| Attacks, first draft | 0 of 60 (0.0%) | 0 of 0 (n/a) |
+| Attacks, what the user saw | 0 of 60 (0.0%) | 0 of 0 (n/a) |
+| Vector retrieval, gold passage in the top 5 | 25 of 26 (96.2%) | 9 of 9 (100.0%) |
+
 ### Where the index runs
 
 Loading the whole index (schema, chunks and vectors) and the retrieval query answering uses, timed from this machine; network time is included. RDS rows come from the one-day trial in [docs/rds-trial.md](docs/rds-trial.md).
@@ -218,7 +230,7 @@ The third pack asks about Immigration New Zealand's [Operational Manual](https:/
 
 Every answer is information from the published instructions, not immigration advice. The Immigration Advisers Licensing Act 2007 leaves out of "immigration advice" providing information that is publicly available or published by the Department (s 7(1)(b)(i)), and directing someone to the Department or to the register of licensed advisers (s 7(1)(b)(ii)). The immigration prompt has one rule more than the GST prompt: a question about the asker's own case (whether they qualify, should apply, which pathway suits them) is refused, with a pointer to Immigration New Zealand or a licensed immigration adviser. The eval set has a fourth kind for those questions, which must be refused, and the number reader also reads points, hours, ages and multiples of a wage threshold ("1.5 times", "twice"). This is a design choice for a portfolio project, not a legal opinion.
 
-The appendices the instructions rely on, such as the Green List occupations, are not in the corpus, and questions that need them are refused.
+The appendices the instructions rely on, such as the Green List occupations, are not in the corpus, and questions that need them are refused. The immigration payloads all target development questions, so its held-back quarter measures answers and refusals only.
 
 ## Eval set
 
