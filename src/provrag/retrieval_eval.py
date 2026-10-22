@@ -18,6 +18,7 @@ import psycopg
 from provrag import cli, evalset, retrieve
 from provrag.embed import GEMINI, Embedder
 from provrag.ingest import Chunk
+from provrag.packs import DEFAULT, PACKS
 from provrag.results import rate, stamp
 
 K = 5
@@ -61,15 +62,15 @@ def summarise(ranks: dict[str, int | None], ids: list[str]) -> dict[str, Any]:
 
 
 def run(
-    conn: psycopg.Connection, embed: Embedder, held_back: bool = False, jurisdiction: str = "NZ"
+    conn: psycopg.Connection, embed: Embedder, held_back: bool = False, pack: str = DEFAULT
 ) -> dict[str, Any]:
     chunks = {c.id: c for c in cli.corpus_chunks()}
-    questions = evalset.questions(held_back, jurisdiction)
+    questions = evalset.questions(held_back, pack)
     answerable = [q for q in questions if q["kind"] == "answerable"]
     by_id = {q["id"]: q for q in questions}
-    payloads = [p for p in evalset.payloads(jurisdiction) if p["target"] in by_id]
-    planted = {p["note"] for p in evalset.payloads(jurisdiction)}
-    notes_source = retrieve.NOTES[jurisdiction]
+    payloads = [p for p in evalset.payloads(pack) if p["target"] in by_id]
+    planted = {p["note"] for p in evalset.payloads(pack)}
+    notes_source = PACKS[pack].notes
     benign = sorted(c.section for c in chunks.values() if c.source == notes_source)
     benign = [n for n in benign if n not in planted]
     vectors = embed([q["question"] for q in questions])
@@ -85,7 +86,7 @@ def run(
             method=method,
             k=k,
             dated=dated,
-            jurisdiction=jurisdiction,
+            pack=pack,
         )
 
     current = max(q["as_of"] for q in answerable)
@@ -125,7 +126,7 @@ def run(
         q["id"]: round(overlap(q["question"], gold_passages[q["id"]]), 4) for q in answerable
     }
     return {
-        **stamp("retrieval", jurisdiction),
+        **stamp("retrieval", pack),
         "questions": "held_back" if held_back else "development",
         "embedding_model": GEMINI.name,
         "dims": GEMINI.dims,

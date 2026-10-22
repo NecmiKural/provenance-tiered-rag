@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from provrag import evalset
+from provrag import evalset, packs
 
 START = "<!-- results:start -->"
 END = "<!-- results:end -->"
@@ -57,20 +57,15 @@ def upper(block: dict[str, Any]) -> str:
     return pct(block["ci95"][1])
 
 
-def of(results: list[dict[str, Any]], jurisdiction: str) -> list[dict[str, Any]]:
-    """Files written before jurisdictions existed are New Zealand's."""
-    return [r for r in results if r.get("jurisdiction", "NZ") == jurisdiction]
+def of(results: list[dict[str, Any]], pack: str) -> list[dict[str, Any]]:
+    return [r for r in results if packs.of_result(r) == pack]
 
 
-def evals(results_dir: Path, jurisdiction: str = "NZ") -> dict[str, dict[str, Any]]:
+def evals(results_dir: Path, pack: str = packs.DEFAULT) -> dict[str, dict[str, Any]]:
     out = {}
     for name in ABLATIONS:
         r = latest(
-            [
-                r
-                for r in of(load(results_dir, "eval"), jurisdiction)
-                if r["defences"]["name"] == name
-            ],
+            [r for r in of(load(results_dir, "eval"), pack) if r["defences"]["name"] == name],
             questions="development",
             mode="record",
             every=1,
@@ -81,17 +76,15 @@ def evals(results_dir: Path, jurisdiction: str = "NZ") -> dict[str, dict[str, An
     return out
 
 
-def held_back(results_dir: Path, jurisdiction: str = "NZ") -> dict[str, Any] | None:
-    found = [
-        r for r in of(load(results_dir, "eval"), jurisdiction) if r["defences"]["name"] == "on"
-    ]
+def held_back(results_dir: Path, pack: str = packs.DEFAULT) -> dict[str, Any] | None:
+    found = [r for r in of(load(results_dir, "eval"), pack) if r["defences"]["name"] == "on"]
     return latest(found, questions="held_back", mode="record", every=1, valid=True)
 
 
 def retrievals(
-    results_dir: Path, questions: str, jurisdiction: str = "NZ"
+    results_dir: Path, questions: str, pack: str = packs.DEFAULT
 ) -> dict[str, Any] | None:
-    found = of(load(results_dir, "retrieval"), jurisdiction)
+    found = of(load(results_dir, "retrieval"), pack)
     return latest([r for r in found if r.get("questions", "development") == questions])
 
 
@@ -154,9 +147,9 @@ def latency_table(results_dir: Path) -> list[str]:
 
 
 def exposure_by_goal(
-    retrieval: dict[str, Any], method: str, jurisdiction: str = "NZ"
+    retrieval: dict[str, Any], method: str, pack: str = packs.DEFAULT
 ) -> dict[str, dict[str, int]]:
-    goals = {p["note"]: p["goal"] for p in evalset.payloads(jurisdiction)}
+    goals = {p["note"]: p["goal"] for p in evalset.payloads(pack)}
     out: dict[str, dict[str, int]] = {g: {"k": 0, "n": 0} for g in GOALS}
     for note, rank in retrieval["methods"][method]["exposure"].items():
         out[goals[note]]["n"] += 1
@@ -217,9 +210,9 @@ def main_table(main: dict[str, Any]) -> list[str]:
 
 
 def attack_table(
-    main: dict[str, Any], retrieval: dict | None, jurisdiction: str = "NZ"
+    main: dict[str, Any], retrieval: dict | None, pack: str = packs.DEFAULT
 ) -> list[str]:
-    exposure = exposure_by_goal(retrieval, "vector", jurisdiction) if retrieval else None
+    exposure = exposure_by_goal(retrieval, "vector", pack) if retrieval else None
     out = [
         "| Payload goal | First draft | What the user saw | Payloads succeeding in any run"
         " (95% upper bound) | Reached the top 5 on its own |",
@@ -282,13 +275,13 @@ def retrieval_table(r: dict[str, Any]) -> list[str]:
 
 def germany(results_dir: Path) -> list[str]:
     """The German UStG section: one consolidation, German questions, the same measurements."""
-    runs = evals(results_dir, "DE")
+    runs = evals(results_dir, "de-vat")
     if "on" not in runs:
         return []
     main = runs["on"]
     a = main["aggregate"]
     right = a["answerable_correct"]
-    retrieval = retrievals(results_dir, "development", "DE")
+    retrieval = retrievals(results_dir, "development", "de-vat")
     off = runs.get("off")
     text = (
         f"German questions on the current consolidation of the UStG and UStDV, with every"
@@ -315,7 +308,7 @@ def germany(results_dir: Path) -> list[str]:
         f"Prompt `{main['prompt_sha']}`, retrieval `{main['method']}` with k={main['k']};"
         f" commit `{main['commit']}`.",
         "",
-        *attack_table(main, retrieval, "DE"),
+        *attack_table(main, retrieval, "de-vat"),
         "",
         *ablation_table(runs),
     ]
@@ -327,14 +320,14 @@ def germany(results_dir: Path) -> list[str]:
             "",
             *retrieval_table(retrieval),
         ]
-    held = held_back(results_dir, "DE")
+    held = held_back(results_dir, "de-vat")
     if held:
         out += [
             "",
             "The German held-back quarter, run once at the end with every defence on."
             f" Commit `{held['commit']}`.",
             "",
-            *held_back_table(main, held, retrieval, retrievals(results_dir, "held_back", "DE")),
+            *held_back_table(main, held, retrieval, retrievals(results_dir, "held_back", "de-vat")),
         ]
     return out
 

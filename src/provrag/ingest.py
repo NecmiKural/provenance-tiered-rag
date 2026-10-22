@@ -10,6 +10,7 @@ import psycopg
 
 from provrag import legislation
 from provrag.embed import Embedder, vector_literal
+from provrag.packs import PACK_OF_SOURCE
 
 # Characters that can carry or reorder text a reader does not see: Unicode tag characters
 # (used to smuggle ASCII instructions) and bidirectional overrides and isolates.
@@ -89,9 +90,9 @@ def source_chunks(source: dict, root: Path = Path(".")) -> list[Chunk]:
 
 
 INSERT_SQL = """
-INSERT INTO corpus.chunk (id, source, tier, jurisdiction, section_key, part, heading, body,
-                          valid, hidden_text, embedding)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, daterange(%s, %s, '[)'), %s, %s::vector)
+INSERT INTO corpus.chunk (id, source, tier, jurisdiction, pack, section_key, part, heading,
+                          body, valid, hidden_text, embedding)
+VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, daterange(%s, %s, '[)'), %s, %s::vector)
 """
 
 
@@ -106,6 +107,7 @@ def load(conn: psycopg.Connection, chunks: list[Chunk], embed: Embedder) -> None
                     c.source,
                     c.tier,
                     c.jurisdiction,
+                    PACK_OF_SOURCE[c.source],
                     c.section,
                     c.part,
                     c.heading,

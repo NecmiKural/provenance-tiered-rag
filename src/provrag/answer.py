@@ -17,7 +17,7 @@ from pydantic import ValidationError
 
 from provrag.ingest import Chunk
 from provrag.llm import LLM, cost_usd, usage_of
-from provrag.numbers import LANGUAGES
+from provrag.packs import DEFAULT, PACKS
 from provrag.verify import Draft, verify
 
 PROMPT = files("provrag").joinpath("prompts/answer.md").read_text()
@@ -37,8 +37,8 @@ TIER_NAMES = {"T1": "statute", "T2": "guidance"}
 PROMPT_DE = files("provrag").joinpath("prompts/answer_de.md").read_text()
 PLAIN_PROMPT_DE = files("provrag").joinpath("prompts/answer_plain_de.md").read_text()
 PROMPT_CANARY_DE = "PROMPT-CANARY-D3W9"
-# The prompt with its rules and the plain prompt, per jurisdiction.
-PROMPTS = {"NZ": (PROMPT, PLAIN_PROMPT), "DE": (PROMPT_DE, PLAIN_PROMPT_DE)}
+# The prompt with its rules and the plain prompt, per pack.
+PROMPTS = {"nz-gst": (PROMPT, PLAIN_PROMPT), "de-vat": (PROMPT_DE, PLAIN_PROMPT_DE)}
 LABELS = {"en": ("Question date", "Question"), "de": ("Stichtag", "Frage")}
 
 
@@ -151,11 +151,11 @@ def answer(
     chunks: list[Chunk],
     llm: LLM,
     defences: Defences = DEFENCES["on"],
-    jurisdiction: str = "NZ",
+    pack: str = DEFAULT,
 ) -> Outcome:
     retrieved = {c.id: c for c in chunks}
-    ruled, plain = PROMPTS[jurisdiction]
-    lang = LANGUAGES[jurisdiction]
+    ruled, plain = PROMPTS[pack]
+    lang = PACKS[pack].lang
     messages = [
         {"role": "system", "content": ruled if defences.prompt_rules else plain},
         {"role": "user", "content": user_message(question, day, chunks, defences, lang)},

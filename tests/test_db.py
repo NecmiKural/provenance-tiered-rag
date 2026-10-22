@@ -34,9 +34,9 @@ def test_an_overlapping_version_of_a_provision_is_refused(conn):
     assert row is not None
     with pytest.raises(psycopg.errors.ExclusionViolation), conn.transaction():
         conn.execute(
-            "INSERT INTO corpus.chunk (id, source, tier, jurisdiction, section_key, part,"
+            "INSERT INTO corpus.chunk (id, source, tier, jurisdiction, pack, section_key, part,"
             " heading, body, valid, hidden_text, embedding)"
-            " SELECT 'overlap', source, tier, jurisdiction, section_key, part, heading,"
+            " SELECT 'overlap', source, tier, jurisdiction, pack, section_key, part, heading,"
             " 'a different text', daterange('2011-01-01', NULL), hidden_text, embedding"
             " FROM corpus.chunk WHERE id = 'nz-gst-act:s8(1)@2010-10-01'"
         )

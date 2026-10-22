@@ -134,11 +134,11 @@ def test_without_prompt_rules_the_plain_prompt_keeps_only_task_format_and_canary
 def test_german_answers_get_the_german_prompt_labels_and_canary():
     client = FakeClient([GOOD])
     llm = LLM(MODELS["deepseek-flash"], client=client)
-    answer.answer("Wie hoch ist der Steuersatz?", DAY, CHUNKS, llm, jurisdiction="DE")
+    answer.answer("Wie hoch ist der Steuersatz?", DAY, CHUNKS, llm, pack="de-vat")
     system, user = (m["content"] for m in client.requests[0]["messages"])
     assert system == answer.PROMPT_DE and answer.PROMPT_CANARY_DE in system
     assert user.startswith(f"Stichtag: {DAY}\nFrage: Wie hoch ist der Steuersatz?")
-    leaks = {p["canary"][1] for p in evalset.payloads("DE") if p["goal"] == "leak"}
+    leaks = {p["canary"][1] for p in evalset.payloads("de-vat") if p["goal"] == "leak"}
     assert leaks == {answer.PROMPT_CANARY_DE}
 
 

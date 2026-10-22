@@ -28,7 +28,8 @@ from provrag.answer import Defences, Outcome
 from provrag.embed import Embedder
 from provrag.ingest import Chunk
 from provrag.llm import LLM, PRICES_CHECKED, ModelSpec
-from provrag.numbers import LANGUAGES, Number, extract, numbers
+from provrag.numbers import Number, extract, numbers
+from provrag.packs import DEFAULT, PACKS
 from provrag.results import rate, stamp
 from provrag.verify import verify
 
@@ -53,15 +54,13 @@ class Case:
 
 
 def payload_chunk(
-    note: str, chunks: dict[str, Chunk], normalise: bool, jurisdiction: str = "NZ"
+    note: str, chunks: dict[str, Chunk], normalise: bool, pack: str = DEFAULT
 ) -> Chunk:
     """The note as the index holds it, or with its invisible characters left in."""
-    (chunk,) = [
-        c for c in chunks.values() if c.source == retrieve.NOTES[jurisdiction] and c.section == note
-    ]
+    (chunk,) = [c for c in chunks.values() if c.source == PACKS[pack].notes and c.section == note]
     if normalise:
         return chunk
-    source = next(s for s in cli.load_sources() if s["id"] == retrieve.NOTES[jurisdiction])
+    source = next(s for s in cli.load_sources() if s["id"] == PACKS[pack].notes)
     (row,) = [r for r in legislation.read_jsonl(Path(source["path"])) if r["section"] == note]
     return Chunk(**{**asdict(chunk), "body": row["text"]})
 
@@ -71,16 +70,16 @@ def build_cases(
     embed: Embedder,
     defences: Defences,
     held_back: bool = False,
-    jurisdiction: str = "NZ",
+    pack: str = DEFAULT,
 ) -> list[Case]:
     chunks = {c.id: c for c in cli.corpus_chunks()}
-    questions = evalset.questions(held_back, jurisdiction)
+    questions = evalset.questions(held_back, pack)
     by_id = {q["id"]: q for q in questions}
-    planted = {p["note"] for p in evalset.payloads(jurisdiction)}
+    planted = {p["note"] for p in evalset.payloads(pack)}
     benign = sorted(
         c.section
         for c in chunks.values()
-        if c.source == retrieve.NOTES[jurisdiction] and c.section not in planted
+        if c.source == PACKS[pack].notes and c.section not in planted
     )
     vectors = embed([q["question"] for q in questions])
     context: dict[str, list[Chunk]] = {}
@@ -93,13 +92,13 @@ def build_cases(
             benign,
             method=METHOD,
             k=K,
-            jurisdiction=jurisdiction,
+            pack=pack,
         )
         context[q["id"]] = [chunks[h.id] for h in hits]
     cases = [Case(q["id"], q, None, context[q["id"]]) for q in questions]
-    for p in evalset.payloads(jurisdiction):
+    for p in evalset.payloads(pack):
         if p["target"] in by_id:
-            note = payload_chunk(p["note"], chunks, defences.normalise, jurisdiction)
+            note = payload_chunk(p["note"], chunks, defences.normalise, pack)
             cases.append(
                 Case(
                     f"{p['target']}+{p['note']}",
@@ -131,7 +130,7 @@ def gold_cited(cited: list[str], question: dict, chunks: dict[str, Chunk]) -> bo
 
 
 def lang_of(question: dict) -> str:
-    return LANGUAGES[question.get("jurisdiction", "NZ")]
+    return PACKS[question.get("pack", DEFAULT)].lang
 
 
 def expected(question: dict) -> set[Number]:
@@ -223,7 +222,7 @@ def run_case(case: Case, llm: LLM, defences: Defences) -> dict[str, Any]:
             case.chunks,
             llm,
             defences,
-            case.question.get("jurisdiction", "NZ"),
+            case.question.get("pack", DEFAULT),
         )
     except TRANSIENT as error:
         return {"id": case.id, "question": case.question["id"], "error": type(error).__name__}
@@ -250,7 +249,7 @@ def quantile(values: list[float], q: float) -> float:
     return statistics.quantiles(values, n=100, method="inclusive")[round(q * 100) - 1]
 
 
-def aggregate(runs: list[list[dict[str, Any]]], jurisdiction: str = "NZ") -> dict[str, Any]:
+def aggregate(runs: list[list[dict[str, Any]]], pack: str = DEFAULT) -> dict[str, Any]:
     """Rates pooled over repeats, and attack bounds over distinct payloads.
 
     Two goals are paired with the clean run of the same question in the same repeat: a refusal
@@ -266,9 +265,7 @@ def aggregate(runs: list[list[dict[str, Any]]], jurisdiction: str = "NZ") -> dic
         if i["payload"] is None
     }
     planted = {
-        p["note"]: tuple(p["canary"])
-        for p in evalset.payloads(jurisdiction)
-        if p["goal"] == "wrong_fact"
+        p["note"]: tuple(p["canary"]) for p in evalset.payloads(pack) if p["goal"] == "wrong_fact"
     }
 
     def hit(r: int, i: dict, level: str) -> bool:
@@ -349,21 +346,21 @@ def evaluate(
     workers: int = 8,
     every: int = 1,
     held_back: bool = False,
-    jurisdiction: str = "NZ",
+    pack: str = DEFAULT,
 ) -> dict[str, Any]:
-    cases = build_cases(conn, embed, defences, held_back, jurisdiction)[::every]
+    cases = build_cases(conn, embed, defences, held_back, pack)[::every]
     runs = [
         run_once(cases, spec, defences, mode, cassette, f"repeat-{r}" if r else "", workers)
         for r in range(repeats)
     ]
-    aggregate_ = aggregate(runs, jurisdiction)
+    aggregate_ = aggregate(runs, pack)
     return {
-        **stamp("eval", jurisdiction),
+        **stamp("eval", pack),
         "model": spec.name,
         "api_model": spec.api_model,
         "model_settings": spec.extra_body,
         "prices_checked": PRICES_CHECKED,
-        "prompt_sha": answer.sha(answer.PROMPTS[jurisdiction][0 if defences.prompt_rules else 1]),
+        "prompt_sha": answer.sha(answer.PROMPTS[pack][0 if defences.prompt_rules else 1]),
         "method": METHOD,
         "k": K,
         "defences": asdict(defences),

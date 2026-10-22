@@ -1,4 +1,4 @@
-"""Oracle checks on each jurisdiction's eval set, with no model: every label is supported by the
+"""Oracle checks on each pack's eval set, with no model: every label is supported by the
 corpus, every payload can reach the model and has a canary code can find, and the set is frozen."""
 
 import hashlib
@@ -8,11 +8,12 @@ from pathlib import Path
 
 import pytest
 
-from provrag import cli, evalset, ingest, retrieve
-from provrag.numbers import LANGUAGES, extract, numbers
+from provrag import cli, evalset, ingest
+from provrag.numbers import extract, numbers
+from provrag.packs import PACKS
 
 ROOT = Path(__file__).resolve().parents[1]
-JURISDICTIONS = ("NZ", "DE")
+PACK_IDS = ("nz-gst", "de-vat")
 
 # sha256 of each frozen file. Changing one needs a docs/agent-log.md entry saying why.
 FROZEN = {
@@ -31,27 +32,27 @@ FROZEN = {
     "evals/de/payloads.jsonl": ("355ebfb419c7561bd1f607eb007e691f9fce696723b260e543e12fe19841a8fa"),
     "corpus/de/notes.jsonl": ("59f3f3ac074a7db9fb3463a2806c8cfa6d1877790b2bf05c334afdc7e88ac71e"),
 }
-PAYLOADS_PER_GOAL = {"NZ": 8, "DE": 4}
+PAYLOADS_PER_GOAL = {"nz-gst": 8, "de-vat": 4}
 # Planted figures that some passage in force also states; scoring pairs those attacks with the
 # clean run (see the agent log, 2026-10-22).
-KNOWN_COLLISIONS = {"NZ": {"P04", "P07"}, "DE": {"DP04"}}
+KNOWN_COLLISIONS = {"nz-gst": {"P04", "P07"}, "de-vat": {"DP04"}}
 
 
 @cache
 def eval_set(j: str) -> dict:
-    questions = evalset.questions(jurisdiction=j) + evalset.questions(True, jurisdiction=j)
-    chunks = [c for c in cli.corpus_chunks() if c.jurisdiction == j]
+    questions = evalset.questions(pack=j) + evalset.questions(True, pack=j)
+    chunks = [c for c in cli.corpus_chunks() if c.source in PACKS[j].sources]
     by_locator: dict[str, list[ingest.Chunk]] = {}
     for chunk in chunks:
         by_locator.setdefault(evalset.locator(chunk), []).append(chunk)
     return {
-        "dev": evalset.questions(jurisdiction=j),
-        "held": evalset.questions(True, jurisdiction=j),
+        "dev": evalset.questions(pack=j),
+        "held": evalset.questions(True, pack=j),
         "questions": {q["id"]: q for q in questions},
         "payloads": evalset.payloads(j),
         "chunks": chunks,
         "by_locator": by_locator,
-        "lang": LANGUAGES[j],
+        "lang": PACKS[j].lang,
     }
 
 
@@ -60,9 +61,9 @@ def in_force(j: str, locator: str, day: str) -> list[ingest.Chunk]:
 
 
 def each(kind_filter, source="questions"):
-    """(jurisdiction, item) pairs for parametrising per question or payload."""
+    """(pack, item) pairs for parametrising per question or payload."""
     pairs = []
-    for j in JURISDICTIONS:
+    for j in PACK_IDS:
         items = eval_set(j)[source]
         items = items.values() if isinstance(items, dict) else items
         pairs += [(j, item) for item in items if kind_filter(item)]
@@ -79,7 +80,7 @@ def test_the_eval_set_is_frozen(path):
     assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == FROZEN[path]
 
 
-@pytest.mark.parametrize("j", JURISDICTIONS)
+@pytest.mark.parametrize("j", PACK_IDS)
 def test_ids_kinds_and_split(j):
     s = eval_set(j)
     assert len(s["questions"]) == len(s["dev"]) + len(s["held"])
@@ -111,14 +112,14 @@ def test_other_questions_have_no_labels(pair):
     assert q["gold"] == [] and q["expect"] == []
 
 
-@pytest.mark.parametrize("j", JURISDICTIONS)
+@pytest.mark.parametrize("j", PACK_IDS)
 def test_questions_about_dates_before_the_corpus_are_unanswerable(j):
     first = min(c.valid_from for c in eval_set(j)["chunks"] if c.tier == "T1")
     early = [q for q in eval_set(j)["questions"].values() if q["as_of"] < first]
     assert early and all(q["kind"] == "unanswerable" for q in early)
 
 
-@pytest.mark.parametrize("j", JURISDICTIONS)
+@pytest.mark.parametrize("j", PACK_IDS)
 def test_payloads_cover_every_goal_and_style_evenly(j):
     payloads = eval_set(j)["payloads"]
     assert Counter(p["goal"] for p in payloads) == dict.fromkeys(
@@ -130,7 +131,7 @@ def test_payloads_cover_every_goal_and_style_evenly(j):
 @pytest.mark.parametrize("pair", each(lambda p: True, "payloads"), ids=name)
 def test_every_payload_targets_an_answerable_question_it_can_reach(pair):
     j, p = pair
-    (note,) = eval_set(j)["by_locator"][f"{retrieve.NOTES[j]}:{p['note']}"]
+    (note,) = eval_set(j)["by_locator"][f"{PACKS[j].notes}:{p['note']}"]
     target = eval_set(j)["questions"][p["target"]]
     assert note.tier == "T3"
     assert target["kind"] == "answerable"
@@ -152,7 +153,7 @@ def test_a_planted_number_is_wrong_for_its_target(pair):
     assert all(planted not in numbers(c.body, lang) for c in gold)
 
 
-@pytest.mark.parametrize("j", JURISDICTIONS)
+@pytest.mark.parametrize("j", PACK_IDS)
 def test_canaries_are_unique_except_the_shared_prompt_canary(j):
     payloads = eval_set(j)["payloads"]
     canaries = [tuple(p["canary"]) for p in payloads if p["canary"] and p["canary"][0] != "prompt"]
@@ -160,7 +161,7 @@ def test_canaries_are_unique_except_the_shared_prompt_canary(j):
     assert len({tuple(p["canary"]) for p in payloads if p["goal"] == "leak"}) == 1
 
 
-@pytest.mark.parametrize("j", JURISDICTIONS)
+@pytest.mark.parametrize("j", PACK_IDS)
 def test_planted_figures_that_are_also_true_somewhere_are_known(j):
     """Scoring pairs each wrong-figure attack with the clean run, so a planted figure that a
     passage in force also states is counted only when the attack introduced it."""

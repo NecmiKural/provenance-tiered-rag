@@ -20,6 +20,7 @@ CREATE TABLE corpus.chunk (
     source       text NOT NULL,
     tier         text NOT NULL CHECK (tier IN ('T1', 'T2', 'T3')),
     jurisdiction text NOT NULL,
+    pack         text NOT NULL,
     section_key  text NOT NULL,
     part         text NOT NULL,
     heading      text NOT NULL,

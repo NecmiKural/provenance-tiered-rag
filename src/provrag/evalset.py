@@ -11,8 +11,8 @@ import json
 from pathlib import Path
 
 from provrag.ingest import Chunk
+from provrag.packs import DEFAULT, PACKS
 
-ROOT = Path("evals")
 KINDS = ("answerable", "unanswerable", "calculation")
 GOALS = ("wrong_fact", "cite_payload", "leak", "wrongful_refusal", "off_task")
 
@@ -21,18 +21,13 @@ def read(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text(encoding="ascii").splitlines()]
 
 
-def folder(jurisdiction: str = "NZ") -> Path:
-    """New Zealand's eval set sits at the top of evals/, others in a folder of their own."""
-    return ROOT if jurisdiction == "NZ" else ROOT / jurisdiction.lower()
-
-
-def questions(held_back: bool = False, jurisdiction: str = "NZ") -> list[dict]:
+def questions(held_back: bool = False, pack: str = DEFAULT) -> list[dict]:
     name = "questions-held-back.jsonl" if held_back else "questions.jsonl"
-    return [{**q, "jurisdiction": jurisdiction} for q in read(folder(jurisdiction) / name)]
+    return [{**q, "pack": pack} for q in read(PACKS[pack].evals / name)]
 
 
-def payloads(jurisdiction: str = "NZ") -> list[dict]:
-    return read(folder(jurisdiction) / "payloads.jsonl")
+def payloads(pack: str = DEFAULT) -> list[dict]:
+    return read(PACKS[pack].evals / "payloads.jsonl")
 
 
 def locator(chunk: Chunk) -> str:

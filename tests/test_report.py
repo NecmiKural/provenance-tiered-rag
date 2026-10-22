@@ -15,9 +15,9 @@ def test_readme_results_are_in_sync():
     )
 
 
-@pytest.mark.parametrize("jurisdiction", ["NZ", "DE"])
-def test_attacks_succeed_somewhere_with_every_defence_off(jurisdiction):
+@pytest.mark.parametrize("pack", ["nz-gst", "de-vat"])
+def test_attacks_succeed_somewhere_with_every_defence_off(pack):
     """An attack set that never succeeds, even undefended, would prove nothing."""
-    off = report.evals(ROOT / "results", jurisdiction).get("off")
+    off = report.evals(ROOT / "results", pack).get("off")
     assert off is not None
     assert off["aggregate"]["attacks_total"]["draft"]["k"] > 0

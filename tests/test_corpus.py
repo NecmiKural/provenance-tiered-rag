@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from provrag import ingest, legislation
+from provrag.packs import PACK_OF_SOURCE, PACKS
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = tomllib.loads((ROOT / "sources.toml").read_text())["source"]
@@ -84,3 +85,10 @@ def test_a_german_consolidation_is_one_version_dated_by_its_last_amendment():
     for rows in GERMAN.values():
         assert len({r["valid_from"] for r in rows}) == 1
         assert all(r["valid_to"] is None and r["text"].strip() for r in rows)
+
+
+def test_every_source_belongs_to_exactly_one_pack_with_its_notes_last():
+    assert sorted(s["id"] for s in SOURCES) == sorted(PACK_OF_SOURCE)
+    assert sum(len(p.sources) for p in PACKS.values()) == len(PACK_OF_SOURCE)
+    tiers = {s["id"]: s["tier"] for s in SOURCES}
+    assert all(tiers[p.notes] == "T3" for p in PACKS.values())

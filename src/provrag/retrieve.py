@@ -14,12 +14,11 @@ import psycopg
 
 from provrag import db
 from provrag.embed import vector_literal
+from provrag.packs import DEFAULT, PACKS
 
 RRF_K = 60
 METHODS = ("full_text", "vector", "rrf")
-NOTES = {"NZ": "nz-notes", "DE": "de-notes"}  # the untrusted-notes source of each jurisdiction
-NOTES_SOURCE = NOTES["NZ"]
-TEXT_SEARCH = {"NZ": "english", "DE": "german"}  # stemming for each jurisdiction's language
+TEXT_SEARCH = {"en": "english", "de": "german"}  # stemming for each language
 
 # Full-text matching is an OR over the question's stemmed lexemes, quoted so no word can be
 # read as query syntax: a question rarely shares every word with the passage that answers it.
@@ -33,7 +32,7 @@ pool AS (
            coalesce(ts_rank_cd(search, (SELECT tsq FROM query)), 0) AS text_score,
            1 - (embedding <=> %(qv)s::vector) AS cosine
     FROM corpus.chunk
-    WHERE jurisdiction = %(jurisdiction)s
+    WHERE pack = %(pack)s
       AND (NOT %(dated)s OR valid @> %(day)s::date)
       AND (source <> %(notes_source)s OR section_key = ANY(%(notes)s))
 ),
@@ -73,7 +72,7 @@ def search(
     method: str = "rrf",
     k: int = 5,
     dated: bool = True,
-    jurisdiction: str = "NZ",
+    pack: str = DEFAULT,
 ) -> list[Hit]:
     """The top k passages for a question as at `day`, read as the reader role."""
     if method not in METHODS:
@@ -84,9 +83,9 @@ def search(
         "day": day,
         "dated": dated,
         "notes": notes,
-        "notes_source": NOTES[jurisdiction],
-        "text_search": TEXT_SEARCH[jurisdiction],
-        "jurisdiction": jurisdiction,
+        "notes_source": PACKS[pack].notes,
+        "text_search": TEXT_SEARCH[PACKS[pack].lang],
+        "pack": pack,
         "method": method,
         "rrf_k": RRF_K,
         "k": k,

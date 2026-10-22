@@ -12,6 +12,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from provrag.packs import DEFAULT, PACKS
+
 Z95 = 1.959964
 DATA = ("sources.toml", "corpus", "evals")
 
@@ -50,14 +52,14 @@ def git_commit() -> str:
     return f"{head}-dirty" if dirty else head
 
 
-def fingerprint(jurisdiction: str = "NZ", root: Path = Path(".")) -> str:
-    """sha256 over the data a run in one jurisdiction reads: each of its sources as listed in
-    sources.toml with the file it points to, and its eval files. Data added for another
-    jurisdiction does not change it."""
+def fingerprint(pack: str = DEFAULT, root: Path = Path(".")) -> str:
+    """sha256 over the data a run in one pack reads: each of its sources as listed in
+    sources.toml with the file it points to, and its eval files. Data added for another pack
+    does not change it."""
     sources = tomllib.loads((root / "sources.toml").read_text())["source"]
-    evals = root / ("evals" if jurisdiction == "NZ" else f"evals/{jurisdiction.lower()}")
+    evals = root / PACKS[pack].evals
     digest = hashlib.sha256()
-    for source in (s for s in sources if s["jurisdiction"] == jurisdiction):
+    for source in (s for s in sources if s["id"] in PACKS[pack].sources):
         digest.update(json.dumps(source, sort_keys=True).encode() + b"\0")
         digest.update((root / source["path"]).read_bytes())
     for path in sorted(evals.glob("*.jsonl")):
@@ -65,13 +67,14 @@ def fingerprint(jurisdiction: str = "NZ", root: Path = Path(".")) -> str:
     return digest.hexdigest()[:16]
 
 
-def stamp(kind: str, jurisdiction: str = "NZ") -> dict[str, Any]:
+def stamp(kind: str, pack: str = DEFAULT) -> dict[str, Any]:
     return {
         "kind": kind,
         "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "commit": git_commit(),
-        "jurisdiction": jurisdiction,
-        "data_fingerprint": fingerprint(jurisdiction),
+        "pack": pack,
+        "jurisdiction": PACKS[pack].jurisdiction,
+        "data_fingerprint": fingerprint(pack),
     }
 
 

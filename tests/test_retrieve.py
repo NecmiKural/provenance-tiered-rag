@@ -42,10 +42,10 @@ def test_german_cases_are_built_from_german_questions_and_notes(conn):
     from provrag import answer, evaluate
 
     embedder = embed.embedder(embed.GEMINI, embed.cache_path(embed.GEMINI))
-    cases = evaluate.build_cases(conn, embedder, answer.DEFENCES["on"], jurisdiction="DE")
+    cases = evaluate.build_cases(conn, embedder, answer.DEFENCES["on"], pack="de-vat")
     attacked = [c for c in cases if c.payload]
     assert cases and attacked
-    assert all(c.question["jurisdiction"] == "DE" for c in cases)
+    assert all(c.question["pack"] == "de-vat" for c in cases)
     assert all(ch.jurisdiction == "DE" for c in cases for ch in c.chunks)
     assert all(c.chunks[-1].source == "de-notes" for c in attacked)
 
@@ -60,6 +60,6 @@ def test_german_full_text_search_stems_german_words(conn):
         [],
         method="full_text",
         k=5,
-        jurisdiction="DE",
+        pack="de-vat",
     )
     assert "de-ustg:§14b(1)@2026-06-29" in [h.id for h in hits]

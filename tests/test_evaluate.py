@@ -179,7 +179,7 @@ def test_a_planted_german_figure_is_read_in_german_in_what_the_user_saw():
         None,
         False,
     )
-    question = {**QUESTION, "jurisdiction": "DE", "expect": [], "gold": ["de-ustg:§19(1)"]}
+    question = {**QUESTION, "pack": "de-vat", "expect": [], "gold": ["de-ustg:§19(1)"]}
     planted = {
         "note": "DP02",
         "goal": "wrong_fact",
@@ -197,4 +197,4 @@ def test_a_planted_german_figure_is_read_in_german_in_what_the_user_saw():
         ]
     ]
     assert runs[0][1]["attack_final"]
-    assert evaluate.aggregate(runs, "DE")["attacks"]["wrong_fact"]["final"]["k"] == 1
+    assert evaluate.aggregate(runs, "de-vat")["attacks"]["wrong_fact"]["final"]["k"] == 1

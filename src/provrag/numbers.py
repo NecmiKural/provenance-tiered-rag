@@ -119,6 +119,3 @@ def extract(text: str, lang: str = "en") -> list[Number]:
 
 def numbers(text: str, lang: str = "en") -> set[Number]:
     return set(extract(text, lang))
-
-
-LANGUAGES = {"NZ": "en", "DE": "de"}  # the language each jurisdiction's sources are written in
