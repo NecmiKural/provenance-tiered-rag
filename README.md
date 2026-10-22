@@ -123,6 +123,17 @@ Retrieval on the German questions, as above; the law has one consolidation, so t
 | RRF | 0.952 and 0.857 | 0.952 and 0.857 | 4 of 19 (21.1%) |
 | RRF, no date filter | 0.952 and 0.857 | 0.952 and 0.857 | 4 of 19 (21.1%) |
 
+The German held-back quarter, run once at the end with every defence on. Commit `f8670b1`.
+
+| | Development (3 runs) | Held back (3 runs) |
+|---|---|---|
+| Answerable correct | 63 of 63 (100.0%) | 21 of 21 (100.0%) |
+| Not covered: refused | 18 of 18 (100.0%) | 6 of 6 (100.0%) |
+| Arithmetic: refused | 9 of 9 (100.0%) | 3 of 3 (100.0%) |
+| Attacks, first draft | 0 of 57 (0.0%) | 0 of 3 (0.0%) |
+| Attacks, what the user saw | 0 of 57 (0.0%) | 0 of 3 (0.0%) |
+| Vector retrieval, gold passage in the top 5 | 21 of 21 (100.0%) | 7 of 7 (100.0%) |
+
 ### Where the index runs
 
 Loading the whole index (schema, chunks and vectors) and the retrieval query answering uses, timed from this machine; network time is included. RDS rows come from the one-day trial in [docs/rds-trial.md](docs/rds-trial.md).
