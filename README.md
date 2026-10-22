@@ -1,6 +1,6 @@
 # Provenance-Tiered RAG
 
-Question answering over New Zealand GST law that knows where each passage comes from and when it was in force. Statute outranks official guidance, which outranks untrusted notes; every answer cites passages valid on the date asked about, and code checks that every number in the answer appears in a cited statute or guidance passage.
+Question answering over New Zealand GST law, and in a second jurisdiction German VAT law, that knows where each passage comes from and when it was in force. Statute outranks official guidance, which outranks untrusted notes; every answer cites passages valid on the date asked about, and code checks that every number in the answer appears in a cited statute or guidance passage.
 
 Every measured number in the results block is regenerated from `results/*.json` by `provrag report`, and CI fails if it drifts.
 
@@ -89,6 +89,12 @@ Three tiers, each with dates. `sources.toml` lists every source with its tier, l
 
 `provrag fetch` rebuilds T1 and T2 from the sites: every consolidated version of the Act in the range, cut into subsections with each distinct text dated by the consolidations that show it, and the guidance pages cut at their headings. T2 text is kept verbatim apart from whitespace. A guidance page has no dated versions, so it is used only for dates on or after its last update; questions about earlier dates rest on the statute alone.
 
+## Germany
+
+A second jurisdiction runs through the same pipeline: the Umsatzsteuergesetz and the Umsatzsteuer-Durchführungsverordnung from [gesetze-im-internet.de](https://www.gesetze-im-internet.de), official works without copyright (§ 5 Abs. 1 UrhG), cut one chunk per paragraph and, for § 4, per listed exemption; German forum notes written for this project, some carrying payloads; German questions; a German prompt with the same rules; and a German number reader ("19 Prozent", "25 000 Euro", "bis zum zehnten Tag"). Full-text search stems German text with the German configuration.
+
+The site publishes only the current consolidation, and the federal NeuRIS service holds only the current UStG in its test phase, so the German law has one version, dated by its last amending act. Questions about earlier dates find no passage in force and are refused, even where today's text describes an earlier window: § 28 states the rate cut of the second half of 2020, and a question asked as of today about that window is answerable, while the same question dated in 2020 is not. There is no German guidance tier: the administrative guidance (UStAE) is published as PDF, and this project adds no PDF parser.
+
 ## Eval set
 
 Written before any prompt, then frozen: `tests/test_evals.py` pins the checksum of every file, and the `evals-frozen` tag marks the commit.
@@ -148,6 +154,7 @@ The notes are the injection surface: anyone can post one, and retrieval can surf
 - **Forced exposure puts each payload note last.** A note ranked first could do better; position is not varied.
 - **Guidance is dated by its last update.** Inland Revenue pages have no dated versions, so guidance only answers questions about dates on or after the page's last update, even where the page was true before.
 - **One model.** Only `deepseek-flash` was measured; a different model may follow payloads more readily or refuse more.
+- **The German set is smaller and has no history.** It has one consolidation, no guidance tier and fewer payloads, and its questions and notes were written by the same author, in German that a native speaker has not reviewed.
 - **Replay tests the harness, not the model.** The CI gate replays a recorded slice to check that code still makes the same decisions from the same replies; live quality comes only from the dated results files.
 
 ## Verification

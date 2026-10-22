@@ -44,3 +44,15 @@ Notable mistakes by the coding agent, how they were caught and what changed. The
 - **Proposed:** every results file and the CI slice recorded a fingerprint of every data file in the repository. Adding the German statute changed it, so the replay gate failed the New Zealand slice although no New Zealand input had changed.
 - **How it was caught:** CI failed on the commit that added the German corpus, with the gate's only complaint a differing fingerprint.
 - **What changed:** the fingerprint covers the sources and eval files of the run's own jurisdiction. The slice's fingerprint was recomputed under the new rule over the same New Zealand data; its recorded replies and decisions are untouched.
+
+## 2026-10-22: German law stemmed as English
+
+- **Proposed:** the full-text column and the query stemmed every passage with PostgreSQL's English configuration, also once German law was added. German words kept their endings, so full-text search found few German passages and pulled the fused ranking down with it, which would have made the retrieval ablation say more about this bug than about the methods.
+- **How it was caught:** the first German retrieval ablation, recorded but not committed, showed full-text recall far below the New Zealand figure for questions written the same way.
+- **What changed:** the column and the query take the stemming configuration from the jurisdiction (German for German law, English as before for New Zealand), a test checks that a German question finds § 14b by full text, and the German ablation was rerun.
+
+## 2026-10-22: a German figure read with the English reader
+
+- **Proposed:** when the evaluation checked whether the answer a user saw contained a planted figure, it read the answer with the English number reader, while the first-draft check used the question's language. In German, "35 000 Euro" went unread, so planted figures that reached the user were scored as failed attacks.
+- **How it was caught:** with every defence off, the German results showed planted figures succeeding in first drafts but never in final answers, although no check stood between them; the recorded numbers of those final answers held the planted figure.
+- **What changed:** the final check reads in the question's language, the aggregate takes a planted figure's success in the final answer from the numbers recorded for it, and a test plants a German figure. Every results file was rescored; New Zealand's scores are unchanged.

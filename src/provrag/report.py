@@ -153,8 +153,10 @@ def latency_table(results_dir: Path) -> list[str]:
     return out
 
 
-def exposure_by_goal(retrieval: dict[str, Any], method: str) -> dict[str, dict[str, int]]:
-    goals = {p["note"]: p["goal"] for p in evalset.payloads()}
+def exposure_by_goal(
+    retrieval: dict[str, Any], method: str, jurisdiction: str = "NZ"
+) -> dict[str, dict[str, int]]:
+    goals = {p["note"]: p["goal"] for p in evalset.payloads(jurisdiction)}
     out: dict[str, dict[str, int]] = {g: {"k": 0, "n": 0} for g in GOALS}
     for note, rank in retrieval["methods"][method]["exposure"].items():
         out[goals[note]]["n"] += 1
@@ -214,8 +216,10 @@ def main_table(main: dict[str, Any]) -> list[str]:
     return ["| | |", "|---|---|", *(f"| {k} | {v} |" for k, v in rows)]
 
 
-def attack_table(main: dict[str, Any], retrieval: dict | None) -> list[str]:
-    exposure = exposure_by_goal(retrieval, "vector") if retrieval else None
+def attack_table(
+    main: dict[str, Any], retrieval: dict | None, jurisdiction: str = "NZ"
+) -> list[str]:
+    exposure = exposure_by_goal(retrieval, "vector", jurisdiction) if retrieval else None
     out = [
         "| Payload goal | First draft | What the user saw | Payloads succeeding in any run"
         " (95% upper bound) | Reached the top 5 on its own |",
@@ -254,10 +258,14 @@ def ablation_table(runs: dict[str, dict[str, Any]]) -> list[str]:
 
 def retrieval_table(r: dict[str, Any]) -> list[str]:
     groups = {
-        "all": "All",
-        "statute_origin": "Written from the Act",
-        "guidance_origin": "Written from guidance",
-        "historical": "About a past date",
+        g: t
+        for g, t in {
+            "all": "All",
+            "statute_origin": "Written from the Act",
+            "guidance_origin": "Written from guidance",
+            "historical": "About a past date",
+        }.items()
+        if r["groups"].get(g)  # a group with no questions has no rates
     }
     out = [
         "| Method | "
@@ -269,6 +277,65 @@ def retrieval_table(r: dict[str, Any]) -> list[str]:
         m = r["methods"][key]
         cells = [f"{m[g]['recall_at_5']['rate']:.3f} and {m[g]['mrr']:.3f}" for g in groups]
         out.append(f"| {title} | " + " | ".join(cells) + f" | {share(m['exposure_at_5'])} |")
+    return out
+
+
+def germany(results_dir: Path) -> list[str]:
+    """The German UStG section: one consolidation, German questions, the same measurements."""
+    runs = evals(results_dir, "DE")
+    if "on" not in runs:
+        return []
+    main = runs["on"]
+    a = main["aggregate"]
+    right = a["answerable_correct"]
+    retrieval = retrievals(results_dir, "development", "DE")
+    off = runs.get("off")
+    text = (
+        f"German questions on the current consolidation of the UStG and UStDV, with every"
+        f" defence on: {right['k']} of {right['n']} answers to answerable questions were correct"
+        f" (95% lower bound {pct(right['ci95'][0])}) over {main['repeats']} runs; questions the"
+        f" sources do not cover, including dates before the consolidation, were refused in"
+        f" {share(a['unanswerable_refused'])} runs, and arithmetic in"
+        f" {share(a['calculation_refused'])}. With a payload note placed in the context,"
+        f" {share(a['attacks_total']['final'])} attacked answers did what the payload asked"
+    )
+    if off:
+        text += (
+            f"; with every defence off, {share(off['aggregate']['attacks_total']['final'])}"
+            f" over {off['repeats']} runs"
+        )
+    out = [
+        "",
+        "### Germany: UStG and UStDV",
+        "",
+        text + ".",
+        "",
+        *main_table(main),
+        "",
+        f"Prompt `{main['prompt_sha']}`, retrieval `{main['method']}` with k={main['k']};"
+        f" commit `{main['commit']}`.",
+        "",
+        *attack_table(main, retrieval, "DE"),
+        "",
+        *ablation_table(runs),
+    ]
+    if retrieval:
+        out += [
+            "",
+            "Retrieval on the German questions, as above; the law has one consolidation, so"
+            f" the date filter changes nothing here. Commit `{retrieval['commit']}`.",
+            "",
+            *retrieval_table(retrieval),
+        ]
+    held = held_back(results_dir, "DE")
+    if held:
+        out += [
+            "",
+            "The German held-back quarter, run once at the end with every defence on."
+            f" Commit `{held['commit']}`.",
+            "",
+            *held_back_table(main, held, retrieval, retrievals(results_dir, "held_back", "DE")),
+        ]
     return out
 
 
@@ -345,6 +412,7 @@ def render(results_dir: Path) -> str:
             "",
             *retrieval_table(retrieval),
         ]
+    lines += germany(results_dir)
     latency = latency_table(results_dir)
     if latency:
         lines += [
