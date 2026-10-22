@@ -360,9 +360,7 @@ def evaluate(
         "api_model": spec.api_model,
         "model_settings": spec.extra_body,
         "prices_checked": PRICES_CHECKED,
-        "prompt_sha": answer.PROMPT_SHA
-        if defences.prompt_rules
-        else answer.sha(answer.PLAIN_PROMPT),
+        "prompt_sha": answer.sha(answer.PROMPTS[jurisdiction][0 if defences.prompt_rules else 1]),
         "method": METHOD,
         "k": K,
         "defences": asdict(defences),

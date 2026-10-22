@@ -34,8 +34,12 @@ PLAIN_PROMPT = files("provrag").joinpath("prompts/answer_plain.md").read_text()
 PROMPT_CANARY = "PROMPT-CANARY-K7Q2"
 JSON = {"type": "json_object"}
 TIER_NAMES = {"T1": "statute", "T2": "guidance"}
+PROMPT_DE = files("provrag").joinpath("prompts/answer_de.md").read_text()
+PLAIN_PROMPT_DE = files("provrag").joinpath("prompts/answer_plain_de.md").read_text()
+PROMPT_CANARY_DE = "PROMPT-CANARY-D3W9"
 # The prompt with its rules and the plain prompt, per jurisdiction.
-PROMPTS = {"NZ": (PROMPT, PLAIN_PROMPT)}
+PROMPTS = {"NZ": (PROMPT, PLAIN_PROMPT), "DE": (PROMPT_DE, PLAIN_PROMPT_DE)}
+LABELS = {"en": ("Question date", "Question"), "de": ("Stichtag", "Frage")}
 
 
 @dataclass(frozen=True)
@@ -116,9 +120,12 @@ def passage(chunk: Chunk, fence: bool) -> str:
     )
 
 
-def user_message(question: str, day: str, chunks: list[Chunk], defences: Defences) -> str:
+def user_message(
+    question: str, day: str, chunks: list[Chunk], defences: Defences, lang: str = "en"
+) -> str:
     passages = "\n\n".join(passage(c, defences.fence) for c in chunks)
-    return f"Question date: {day}\nQuestion: {_fenced(question)}\n\n{passages}"
+    date_label, question_label = LABELS[lang]
+    return f"{date_label}: {day}\n{question_label}: {_fenced(question)}\n\n{passages}"
 
 
 def repair_message(errors: list[str]) -> str:
@@ -151,7 +158,7 @@ def answer(
     lang = LANGUAGES[jurisdiction]
     messages = [
         {"role": "system", "content": ruled if defences.prompt_rules else plain},
-        {"role": "user", "content": user_message(question, day, chunks, defences)},
+        {"role": "user", "content": user_message(question, day, chunks, defences, lang)},
     ]
     outcome = Outcome()
     for round_ in (1, 2):
