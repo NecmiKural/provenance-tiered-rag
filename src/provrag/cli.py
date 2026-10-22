@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import tomllib
 from datetime import date
 from pathlib import Path
@@ -149,6 +150,22 @@ def cmd_eval(args: argparse.Namespace) -> None:
     print(f"wrote {path} (commit {result['commit']})")
 
 
+def cmd_rescore(args: argparse.Namespace) -> None:
+    """Recompute every evaluation file's aggregate from its recorded runs with today's scoring,
+    and record the commit that scored it. The runs themselves are not touched."""
+    scored_with = results.git_commit()
+    for path in sorted(args.out.glob("*.json")):
+        result = json.loads(path.read_text())
+        if result.get("kind") != "eval":
+            continue
+        before = result["aggregate"]["attacks_total"]["final"]["k"]
+        result["aggregate"] = evaluate.aggregate(result["runs"])
+        result["scored_with"] = scored_with
+        path.write_text(json.dumps(result, indent=1, sort_keys=True) + "\n")
+        after = result["aggregate"]["attacks_total"]["final"]["k"]
+        print(f"{path.name}: attacks that succeeded {before} -> {after}")
+
+
 def cmd_report(args: argparse.Namespace) -> None:
     stale = report.sync(Path("README.md"), Path("results"), check=args.check)
     if args.check and stale:
@@ -186,6 +203,9 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--out", type=Path, default=Path("results"))
     p.add_argument("--name", default=None)
     p.set_defaults(func=cmd_eval)
+    p = sub.add_parser("rescore", help="recompute aggregates from the recorded runs")
+    p.add_argument("--out", type=Path, default=Path("results"))
+    p.set_defaults(func=cmd_rescore)
     p = sub.add_parser("report", help="rewrite the README results block from results/*.json")
     p.add_argument("--check", action="store_true", help="fail if the block is stale")
     p.set_defaults(func=cmd_report)
