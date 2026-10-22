@@ -1,0 +1,17 @@
+{
+ "chunks": 732,
+ "commit": "418c066",
+ "data_fingerprint": "b765f20019c0cd48",
+ "generated_at": "2026-10-22T02:10:49+00:00",
+ "jurisdiction": "NZ",
+ "k": 5,
+ "kind": "latency",
+ "label": "local-docker",
+ "load_seconds": 0.22,
+ "method": "vector",
+ "pgvector": "0.8.7",
+ "queries": 220,
+ "query_p50_ms": 2.96,
+ "query_p95_ms": 3.97,
+ "server_version": "17.11 (Debian 17.11-1.pgdg12+2)"
+}

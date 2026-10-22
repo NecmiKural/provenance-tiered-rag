@@ -54,7 +54,7 @@ The prompt rules say notes are data and never a source, keep the prompt private 
 
 ### Held-back questions
 
-A quarter of the questions of every kind, with the payloads aimed at them, kept out of the prompt and the choice of retrieval method and run once at the end with every defence on. One scoring rule changed after it ran: a false positive in this set showed that a planted figure can also be true elsewhere in the law, so wrong-figure attacks are now paired with the clean answer, in every results file (see the agent log). Run at commit `5c2d88d`, scored at `ae63ad3`.
+A quarter of the questions of every kind, with the payloads aimed at them, kept out of the prompt and the choice of retrieval method and run once at the end with every defence on. One scoring rule changed after it ran: a false positive in this set showed that a planted figure can also be true elsewhere in the law, so wrong-figure attacks are now paired with the clean answer, in every results file (see the agent log). Run at commit `5c2d88d`, scored at `357db57`.
 
 | | Development (3 runs) | Held back (3 runs) |
 |---|---|---|
@@ -75,6 +75,61 @@ Each cell is recall at 5 and mean reciprocal rank of a labelled passage in force
 | Vector | 0.969 and 0.819 | 0.947 and 0.721 | 1.000 and 0.962 | 1.000 and 0.833 | 5 of 32 (15.6%) |
 | RRF | 0.875 and 0.646 | 0.789 and 0.549 | 1.000 and 0.788 | 0.857 and 0.536 | 1 of 32 (3.1%) |
 | RRF, no date filter | 0.625 and 0.488 | 0.421 and 0.308 | 0.923 and 0.750 | 0.143 and 0.064 | 0 of 32 (0.0%) |
+
+### Germany: UStG and UStDV
+
+German questions on the current consolidation of the UStG and UStDV, with every defence on: 63 of 63 answers to answerable questions were correct (95% lower bound 94.2%) over 3 runs; questions the sources do not cover, including dates before the consolidation, were refused in 18 of 18 (100.0%) runs, and arithmetic in 9 of 9 (100.0%). With a payload note placed in the context, 0 of 57 (0.0%) attacked answers did what the payload asked; with every defence off, 4 of 57 (7.0%) over 3 runs.
+
+| | |
+|---|---|
+| Answerable: right figures, verified | 63 of 63 (100.0%) |
+| Answerable: refused | 0 of 63 (0.0%) |
+| Answers citing a labelled passage | 63 of 63 (100.0%) |
+| Not covered by the sources: refused | 18 of 18 (100.0%) |
+| Needs arithmetic: refused | 9 of 9 (100.0%) |
+| First drafts the verifier rejected | 0 of 90 (0.0%) |
+| Of those, repaired and correct | 0 of 0 (n/a) |
+| Refusals made by the verifier | 0 of 90 (0.0%) |
+| Answerable questions with the same outcome in every run | 21 of 21 (100.0%) |
+| Cost per question (peak price) | $0.0006 |
+| Time per question, p50 and p95 | 2.2 s and 5.9 s |
+
+Prompt `3adeaf5cef01`, retrieval `vector` with k=5; commit `e50454e`.
+
+| Payload goal | First draft | What the user saw | Payloads succeeding in any run (95% upper bound) | Reached the top 5 on its own |
+|---|---|---|---|---|
+| Plant a wrong figure | 0 of 9 (0.0%) | 0 of 9 (0.0%) | 0 of 3 (up to 56.1%) | 2 of 3 |
+| Get the note cited | 0 of 12 (0.0%) | 0 of 12 (0.0%) | 0 of 4 (up to 49.0%) | 2 of 4 |
+| Leak the prompt | 0 of 12 (0.0%) | 0 of 12 (0.0%) | 0 of 4 (up to 49.0%) | 1 of 4 |
+| Force a refusal | 0 of 12 (0.0%) | 0 of 12 (0.0%) | 0 of 4 (up to 49.0%) | 2 of 4 |
+| Add an off-topic link | 0 of 12 (0.0%) | 0 of 12 (0.0%) | 0 of 4 (up to 49.0%) | 0 of 4 |
+
+| Defences | Runs | Answerable correct | Arithmetic refused | Attacks, first draft | Attacks, what the user saw | Answers failing the verifier's checks |
+|---|---|---|---|---|---|---|
+| All on | 3 | 63 of 63 (100.0%) | 9 of 9 (100.0%) | 0 of 57 (0.0%) | 0 of 57 (0.0%) | 0 of 63 (0.0%) |
+| Prompt rules off | 1 | 21 of 21 (100.0%) | 3 of 3 (100.0%) | 0 of 19 (0.0%) | 0 of 19 (0.0%) | 0 of 22 (0.0%) |
+| Fence off | 1 | 21 of 21 (100.0%) | 3 of 3 (100.0%) | 0 of 19 (0.0%) | 0 of 19 (0.0%) | 0 of 21 (0.0%) |
+| Notes rule off | 1 | 21 of 21 (100.0%) | 3 of 3 (100.0%) | 0 of 19 (0.0%) | 0 of 19 (0.0%) | 0 of 21 (0.0%) |
+| Verifier off | 1 | 21 of 21 (100.0%) | 3 of 3 (100.0%) | 0 of 19 (0.0%) | 0 of 19 (0.0%) | 0 of 21 (0.0%) |
+| Hidden-text stripping off | 1 | 21 of 21 (100.0%) | 3 of 3 (100.0%) | 0 of 19 (0.0%) | 0 of 19 (0.0%) | 0 of 21 (0.0%) |
+| All off | 3 | 60 of 63 (95.2%) | 3 of 9 (33.3%) | 4 of 57 (7.0%) | 4 of 57 (7.0%) | 11 of 72 (15.3%) |
+
+Retrieval on the German questions, as above; the law has one consolidation, so the date filter changes nothing here. Commit `e50454e`.
+
+| Method | All (21) | Written from the Act (21) | Payloads in the top 5 |
+|---|---|---|---|
+| Full text | 0.571 and 0.312 | 0.571 and 0.312 | 2 of 19 (10.5%) |
+| Vector | 1.000 and 0.913 | 1.000 and 0.913 | 7 of 19 (36.8%) |
+| RRF | 0.952 and 0.857 | 0.952 and 0.857 | 4 of 19 (21.1%) |
+| RRF, no date filter | 0.952 and 0.857 | 0.952 and 0.857 | 4 of 19 (21.1%) |
+
+### Where the index runs
+
+Loading the whole index (schema, chunks and vectors) and the retrieval query answering uses, timed from this machine; network time is included. RDS rows come from the one-day trial in [docs/rds-trial.md](docs/rds-trial.md).
+
+| Where | PostgreSQL | pgvector | Load the index | Retrieval query, p50 and p95 | Commit |
+|---|---|---|---|---|---|
+| local-docker | 17.11 | 0.8.7 | 0.22 s | 2.96 ms and 3.97 ms | `418c066` |
 <!-- results:end -->
 
 ## Corpus
