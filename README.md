@@ -297,7 +297,7 @@ The notes are the injection surface: anyone can post one, and retrieval can surf
 - **The immigration archive is what the manual keeps.** Where the manual holds no copy of a version, the one before it stays in force here until the next it holds. Section index pages and two undated notes are left out, and so are the appendices.
 - **Table cells carry bare figures.** A points table gives "3" under a "Points" heading, which the number reader does not type, so a claim of "3 points" quoted from it cannot be checked and fails; with every defence on it is repaired or refused, and in the runs with the verifier off it counts against the answer.
 - **Whether a question asks for advice is the model's call.** The advice questions measure refusals; code does not check what a refusal's reason says, and a reason can still touch on the asker's case while declining to assess it.
-- **Replay tests the harness, not the model.** The CI gate replays a recorded slice to check that code still makes the same decisions from the same replies; live quality comes only from the dated results files.
+- **Replay tests the harness, not the model.** The CI gate replays a recorded slice of the GST and of the immigration questions to check that code still makes the same decisions from the same replies; live quality comes only from the dated results files.
 
 ## Verification
 
@@ -306,7 +306,7 @@ The notes are the injection surface: anyone can post one, and retrieval can surf
 - `tests/test_opsmanual.py` checks the manual's parser on a page fixture and the built archive: the median wage in force on three dates, a revoked instruction ending on its revocation date, and one text per part on any day.
 - `tests/test_numbers.py` and `tests/test_verify.py` cover typed numbers and each verifier rule; `tests/test_answer.py` and `tests/test_evaluate.py` run the loop and the scoring against a scripted model.
 - `tests/test_db.py` and `tests/test_retrieve.py` run against Postgres: the reader role cannot write, an overlapping version is refused, and every passage retrieved is in force on the date.
-- `tests/test_gate.py` replays a committed slice through retrieval, answering and scoring and requires the recorded decisions; a copy with every reply turned into a refusal must fail, and nothing recorded may carry a key.
+- `tests/test_gate.py` replays a committed slice through retrieval, answering and scoring and requires the recorded decisions, for New Zealand GST and for immigration; a copy with every reply turned into a refusal must fail, and nothing recorded may carry a key.
 - `tests/test_report.py` fails if the results block differs from what `provrag report` writes, or if attacks never succeed even with every defence off.
 - Every results file records the commit, marked dirty if code, dependencies or data differed from it, and a fingerprint of the data; evaluation files also record the prompt hash and the model settings.
 
