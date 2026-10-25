@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Recorded answers from a retrieval system for tax and immigration questions, each with the dated passages it cites. Nothing on this page calls a model.">
+<title>Provenance-tiered RAG evidence</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+<script type="module" src="app.js"></script>
+</head>
+<body>
+<header class="masthead">
+  <p class="kicker">provenance-tiered-rag / evidence viewer</p>
+  <h1>Recorded answers, with the dated passages they cite</h1>
+  <div class="notices">
+    <p class="notice"><strong>Replayed from recorded runs, not live.</strong> Model replies come from recordings; retrieval, the verifier and the scoring were run again on them. Nothing on this page calls a model.</p>
+    <p class="notice"><strong>Information, not tax or immigration advice.</strong> A portfolio project: the questions, notes and evaluation were written for it.</p>
+    <p class="notice"><strong>Planted notes are attacks.</strong> Some untrusted notes carry prompt-injection payloads on purpose. They are shown as plain text and never followed.</p>
+  </div>
+  <p class="build" id="build">Personal project. Code under the MIT licence; source texts under the terms in <a href="https://github.com/NecmiKural/provenance-tiered-rag/blob/main/docs/evidence/LICENSE.md">LICENSE.md</a>. <a href="https://github.com/NecmiKural/provenance-tiered-rag">Source and results on GitHub</a></p>
+</header>
+
+<main>
+  <noscript>
+    <p class="panel">This viewer needs JavaScript. The recorded answers are plain JSON: <a href="nz-gst.json">nz-gst.json</a>, <a href="de-vat.json">de-vat.json</a> and <a href="nz-immigration.json">nz-immigration.json</a>.</p>
+  </noscript>
+
+  <section class="controls" aria-label="Choose what to show">
+    <div class="field">
+      <label for="pack">Body of law</label>
+      <select id="pack"></select>
+    </div>
+    <p class="quiet" id="pack-info"></p>
+    <p class="notice" id="pack-note" hidden></p>
+  </section>
+
+  <p class="alert" id="alert" role="alert" hidden></p>
+
+  <div class="workspace">
+    <section class="cases" aria-labelledby="cases-title">
+      <h2 id="cases-title">Questions and attacks</h2>
+      <div class="filters">
+        <div class="field">
+          <label for="show">Show</label>
+          <select id="show">
+            <option value="all">Every case</option>
+            <option value="clean">Clean questions</option>
+            <option value="attacked">Questions with a planted note</option>
+            <option value="held_back">Held-back questions</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="outcome">Outcome</label>
+          <select id="outcome">
+            <option value="all">Any</option>
+            <option value="correct">Correct</option>
+            <option value="not_correct">Not correct</option>
+            <option value="attack_through">Attack reached the answer</option>
+          </select>
+        </div>
+      </div>
+      <p class="quiet" id="count" role="status"></p>
+      <ul class="case-list" id="case-list"></ul>
+    </section>
+
+    <section class="detail" id="detail" aria-labelledby="detail-title">
+      <h2 id="detail-title" tabindex="-1">Choose a question</h2>
+      <div id="detail-body"></div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <p>Each case is shown as the first of its recorded runs; the outcome of every repeat comes from the results file named above. Statute and guidance text is quoted as published, with its source, licence and the dates it was in force. Long dashes in recorded model text are shown as commas. Rates across all cases are in the <a href="https://github.com/NecmiKural/provenance-tiered-rag#readme">README results</a>, computed from the same files.</p>
+</footer>
+</body>
+</html>
