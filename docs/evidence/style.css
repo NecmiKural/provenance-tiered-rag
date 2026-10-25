@@ -156,6 +156,18 @@ h1 {
 
 main {
   padding: 0 var(--gutter) var(--gutter);
+  min-height: 100svh;
+}
+
+/* Until the first file loads, the sections keep their place but stay unseen, so nothing on
+   screen moves when the data arrives. */
+main[aria-busy="true"] > :not(noscript) {
+  visibility: hidden;
+}
+
+.runs {
+  margin: 0;
+  padding-left: 1.1rem;
 }
 
 .controls {

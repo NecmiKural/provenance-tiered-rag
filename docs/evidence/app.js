@@ -103,6 +103,8 @@ async function show(pack, id = null, focus = false) {
     $("alert").textContent = `Could not load the recording: ${error.message}`;
     $("alert").hidden = false;
     return;
+  } finally {
+    document.querySelector("main").removeAttribute("aria-busy");
   }
   $("alert").hidden = true;
   state.pack = pack;
@@ -121,12 +123,11 @@ function renderPack(doc) {
     const ok = /^results\/[\w.-]+\.json$/.test(run.file);
     return ok ? el("a", { href: `${REPO}/blob/main/${run.file}`, text: run.file }) : run.file;
   };
+  // Short items, not one long paragraph: nothing large paints late, after the data arrives.
   $("pack-info").replaceChildren(
-    `Development questions recorded on ${dev.recorded_at.slice(0, 10)} (`,
-    file(dev),
-    `), held-back questions on ${held.recorded_at.slice(0, 10)} (`,
-    file(held),
-    `), both with ${dev.model}. Each case ran ${dev.repeats} times; the answer shown is the first run.`,
+    el("li", {}, `Development questions recorded on ${dev.recorded_at.slice(0, 10)}: `, file(dev)),
+    el("li", {}, `Held-back questions recorded on ${held.recorded_at.slice(0, 10)}: `, file(held)),
+    el("li", { text: `Both with ${dev.model}. Each case ran ${dev.repeats} times; the answer shown is the first run.` }),
   );
   $("pack-note").textContent = PACK_NOTES[doc.pack] || "";
   $("pack-note").hidden = !PACK_NOTES[doc.pack];

@@ -22,7 +22,7 @@
   <p class="build" id="build">Personal project. Code under the MIT licence; source texts under the terms in <a href="https://github.com/NecmiKural/provenance-tiered-rag/blob/main/docs/evidence/LICENSE.md">LICENSE.md</a>. <a href="https://github.com/NecmiKural/provenance-tiered-rag">Source and results on GitHub</a></p>
 </header>
 
-<main>
+<main aria-busy="true">
   <noscript>
     <p class="panel">This viewer needs JavaScript. The recorded answers are plain JSON: <a href="nz-gst.json">nz-gst.json</a>, <a href="de-vat.json">de-vat.json</a> and <a href="nz-immigration.json">nz-immigration.json</a>.</p>
   </noscript>
@@ -32,7 +32,7 @@
       <label for="pack">Body of law</label>
       <select id="pack"></select>
     </div>
-    <p class="quiet" id="pack-info"></p>
+    <ul class="quiet runs" id="pack-info"></ul>
     <p class="notice" id="pack-note" hidden></p>
   </section>
 
