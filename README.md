@@ -2,6 +2,8 @@
 
 Question answering over New Zealand GST law, German VAT law and New Zealand immigration instructions, that knows where each passage comes from and when it was in force. Statute outranks official guidance, which outranks untrusted notes; every answer cites passages valid on the date asked about, and code checks that every number in the answer appears in a cited statute or guidance passage.
 
+[![Open the evidence viewer in Hugging Face Spaces](https://huggingface.co/datasets/huggingface/badges/resolve/main/open-in-hf-spaces-md.svg)](https://huggingface.co/spaces/necmikural/provenance-rag-evidence) Every recorded answer with the dated passages it cites, in the browser: replayed from recorded runs, no key.
+
 Every measured number in the results block is regenerated from `results/*.json` by `provrag report`, and CI fails if it drifts.
 
 <!-- results:start -->
