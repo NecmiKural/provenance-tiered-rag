@@ -16,6 +16,7 @@ size_categories:
   - n<1K
 configs:
   - config_name: nz-gst
+    default: true
     data_files:
       - split: development
         path: nz-gst/questions.jsonl
