@@ -367,12 +367,14 @@ src/provrag/
   latency.py        timing the index where it runs
   report.py         the README results block
   evidence.py       the evidence viewer's files, replayed from the recorded runs
+  dataset.py        the eval set laid out as a Hugging Face dataset
   cli.py            the provrag command
 tests/              unit, database, gate and README tests; cassettes/ holds the CI slice
 results/            dated results files
 infra/              Terraform for the RDS trial and its connection script
 docs/               threat model, agent log and the RDS runbook
 docs/evidence/      the static evidence viewer and its files, deployed as a Hugging Face Space
+docs/dataset/       the card of the eval set's Hugging Face dataset
 ```
 
 ## How this was built
