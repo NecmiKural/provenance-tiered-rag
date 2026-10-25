@@ -307,6 +307,7 @@ The notes are the injection surface: anyone can post one, and retrieval can surf
 - `tests/test_numbers.py` and `tests/test_verify.py` cover typed numbers and each verifier rule; `tests/test_answer.py` and `tests/test_evaluate.py` run the loop and the scoring against a scripted model.
 - `tests/test_db.py` and `tests/test_retrieve.py` run against Postgres: the reader role cannot write, an overlapping version is refused, and every passage retrieved is in force on the date.
 - `tests/test_gate.py` replays a committed slice through retrieval, answering and scoring and requires the recorded decisions, for New Zealand GST and for immigration; a copy with every reply turned into a refusal must fail, and nothing recorded may carry a key.
+- `tests/test_evidence.py` checks the evidence viewer's files against the results files: every case's refusal, citations, attempts and per-run outcome as recorded, every question as in the eval set, every passage as in the corpus, and a licence note for every source.
 - `tests/test_report.py` fails if the results block differs from what `provrag report` writes, or if attacks never succeed even with every defence off.
 - Every results file records the commit, marked dirty if code, dependencies or data differed from it, and a fingerprint of the data; evaluation files also record the prompt hash and the model settings.
 
@@ -322,6 +323,7 @@ make demo      # replays the committed slice; no key needed
 make eval      # live, three runs, clean and attacked; writes results/*.json
 make ablate    # every defence off, and each one off alone
 uv run provrag report                 # rewrite the results block above
+uv run provrag evidence               # docs/evidence/*.json from the local cassettes
 uv run provrag retrieval              # the retrieval ablation (embeddings only)
 uv run provrag fetch                  # rebuild corpus/ from the sites; checksums must match
 uv run --env-file .env provrag ask "What was the GST rate?" --as-of 2010-09-30
@@ -362,11 +364,13 @@ src/provrag/
   gate.py           the CI gate for a replayed slice
   latency.py        timing the index where it runs
   report.py         the README results block
+  evidence.py       the evidence viewer's files, replayed from the recorded runs
   cli.py            the provrag command
 tests/              unit, database, gate and README tests; cassettes/ holds the CI slice
 results/            dated results files
 infra/              Terraform for the RDS trial and its connection script
 docs/               threat model, agent log and the RDS runbook
+docs/evidence/      the static evidence viewer and its files, deployed as a Hugging Face Space
 ```
 
 ## How this was built

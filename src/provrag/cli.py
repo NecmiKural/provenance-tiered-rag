@@ -14,6 +14,7 @@ from provrag import (
     db,
     embed,
     evaluate,
+    evidence,
     gii,
     guidance,
     ingest,
@@ -210,6 +211,18 @@ def cmd_report(args: argparse.Namespace) -> None:
     print("README results " + ("rewritten" if stale else "already in sync"))
 
 
+def cmd_evidence(args: argparse.Namespace) -> None:
+    with db.connect() as conn:
+        db.reset(conn)
+        ingest.load(
+            conn, corpus_chunks(), embed.embedder(embed.GEMINI, embed.cache_path(embed.GEMINI))
+        )
+        stale = evidence.write(conn, check=args.check)
+    if args.check and stale:
+        raise SystemExit(f"evidence files are stale: {stale}; run `uv run provrag evidence`")
+    print("evidence files " + ("rewritten" if stale else "already in sync"))
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="provrag", description=__doc__)
     sub = parser.add_subparsers(required=True)
@@ -253,6 +266,9 @@ def main(argv: list[str] | None = None) -> None:
     p = sub.add_parser("report", help="rewrite the README results block from results/*.json")
     p.add_argument("--check", action="store_true", help="fail if the block is stale")
     p.set_defaults(func=cmd_report)
+    p = sub.add_parser("evidence", help="replay the recorded runs into docs/evidence/*.json")
+    p.add_argument("--check", action="store_true", help="fail if the files are out of date")
+    p.set_defaults(func=cmd_evidence)
     args = parser.parse_args(argv)
     args.func(args)
 

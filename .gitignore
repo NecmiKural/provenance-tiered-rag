@@ -28,3 +28,6 @@ infra/terraform/.terraform/
 *.tfstate.*
 *.tfvars
 infra/rds-global-bundle.pem
+
+# Written by the Space deploy job
+docs/evidence/build.json
