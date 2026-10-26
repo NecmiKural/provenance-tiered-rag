@@ -14,6 +14,55 @@ tags:
   - legal
 size_categories:
   - n<1K
+dataset_info:
+  - config_name: nz-gst
+    features:
+      - name: as_of
+        dtype: string
+      - name: expect
+        sequence: string
+      - name: gold
+        sequence: string
+      - name: id
+        dtype: string
+      - name: kind
+        dtype: string
+      - name: origin
+        dtype: string
+      - name: question
+        dtype: string
+  - config_name: de-vat
+    features:
+      - name: as_of
+        dtype: string
+      - name: expect
+        sequence: string
+      - name: gold
+        sequence: string
+      - name: id
+        dtype: string
+      - name: kind
+        dtype: string
+      - name: origin
+        dtype: string
+      - name: question
+        dtype: string
+  - config_name: nz-immigration
+    features:
+      - name: as_of
+        dtype: string
+      - name: expect
+        sequence: string
+      - name: gold
+        sequence: string
+      - name: id
+        dtype: string
+      - name: kind
+        dtype: string
+      - name: origin
+        dtype: string
+      - name: question
+        dtype: string
 configs:
   - config_name: nz-gst
     default: true
