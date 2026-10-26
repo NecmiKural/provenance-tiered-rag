@@ -244,6 +244,8 @@ Written before any prompt, then frozen: `tests/test_evals.py` pins the checksum 
 
 The German and immigration sets sit in `evals/de/` and `evals/nz-immigration/`, each frozen under its own tag (`evals-de-frozen`, `evals-nz-immigration-frozen`) before its prompt was written.
 
+The same files are on Hugging Face as the dataset [necmikural/provenance-rag-evals](https://huggingface.co/datasets/necmikural/provenance-rag-evals), one subset of questions and one of payloads per pack; CI uploads it from `main` when the eval set or its card changes.
+
 Oracle tests check, with no model, that every gold passage exists and is in force on the question's date, that every expected number is in it as the same typed number, that every payload note is posted before its target's date, and that every planted figure is wrong for its target.
 
 ## Index
